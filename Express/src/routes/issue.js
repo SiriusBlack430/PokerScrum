@@ -124,9 +124,35 @@ async function getRepConfig(){
     return repConfig[0]
 }
 
+//ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
+router.post("/configRepos",async (req,res)=>{
+  var data = req.body;
+  try{
+    headers = {
+      "Content-Type":"application/json",
+      Authorization: "bearer "+data.token
+    } 
+    const info = await fetch(baseUrl,{
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(issues(data.user,data.project))
+    })
+    const infoJson = await info.json();
+    var fields = infoJson.data.user.projectV2.fields.nodes;
+    if(fields.length>0){
+      //await pool.query("INSERT INTO REPCONFIG(name,token,project) VALUES(?,?,?)",[data.user,data.token,data.project]);
+      res.sendStatus(200);
+    }
+  }catch(e){
+    console.log(e);
+    res.sendStatus(404);
+  }
+})
+
 router.get("game",async(req,res)=>{
     
 })
+
 router.post("/searchIssue",async(req,res)=>{
     busqueda = req.body.status;
     if(element.length===0){
