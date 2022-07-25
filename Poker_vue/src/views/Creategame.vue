@@ -1,55 +1,67 @@
 <script>
-import {queryAPI} from '../store/query/actions'
+import {repoConfig} from '../store/query/actions'
 
-export default{
-  name: 'CreateGame',
-  data() {
-    return {
-      gameName:'',
-      usuario:'',
-      token:'',
-      project:''
+export default {
+  name:"gameConnection",
+  data(){
+    return{
+      room:"",
+      user:"",
+      token:"",
+      project:"",
+      showError:false
     }
   },
-  methods: {
-    async checkConfig(){
-
+  methods:{
+    async connection(){
+      try{
+        const next = await repoConfig(this.user,this.token,this.project,this.room);
+      }catch(e){
+        this.showError=true;
+        console.log("Error"+e)
+      }
     }
-  },
+  }
 }
+
+
 </script>
 <template>
   <div class="menu-container">
-    <header>
-      <div class="left">
-        <a href="/">
-          <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
-        </a>
-        <h1>Create Game</h1>
-      </div>
-    </header>
+  <header>
+    <div class="left">
+      <a href="/">
+        <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
+      </a>
+      <h1>Create Game</h1>
+    </div>
+  </header>
   </div>
   <div class="space"></div>
   <main>
     <div class="container">
       <h2>CONFIGURATION</h2>
-      <form @submit.prevent="checkConfig">
+
+    <!-- <form @submit.prevent="getNamefunction"> -->
+      <div v-if="showError">Error!</div>
+      <form @submit.prevent="connection">
         <div class="data">
-            <input 
+            <label for="room">Room:</label>
+            <input
             type="text" 
-            name="gameName" 
-            v-model="gameName"
-            placeholder="Enter Game Name"
+            name="room"
+            v-model="room"
+            placeholder="Enter Game Room"
             required
             >
         </div>
         <div class="data">
-            <label for="repository">Usuario:</label>
+            <label for="repository">User:</label>
             <input 
             type="text" 
             name="repository" 
             placeholder="Enter Repository Name"
-            v-model="usuario"
+            v-model="user"
             />
         </div>
         <div class="data">
@@ -79,5 +91,4 @@ export default{
 </template>
 
 <style>
-
 </style>
