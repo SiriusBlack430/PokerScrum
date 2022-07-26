@@ -12,6 +12,7 @@ function issues(user,projectNum){
       query{
         user(login:"${user}"){
           projectV2(number:${projectNum}){
+            title
             fields(first:20){
               nodes{
                 ... on ProjectV2SingleSelectField{
@@ -68,6 +69,7 @@ async function getIssue(){
       })
       const infoJson = await info.json();
       let fields = infoJson.data.user.projectV2.fields.nodes;
+      var project = infoJson.data.user.projectV2.title;
       let statusNames;
       for(let i=0;i<fields.length;i++){
         if(fields[i].name === "Status"){
@@ -84,14 +86,14 @@ async function getIssue(){
           }
         }
         cart.label=""
-        if(items[i].content.__typename==="Issue"){
+        if(items[i].content.__typename==="Issue"){ 
           cart.id = items[i].content.number
           cart.title = items[i].content.title
           cart.url = items[i].content.bodyUrl
           for(let l=0; l<items[i].content.labels.nodes.length; l++){
               cart.label = items[i].content.labels.nodes[l].name+" "+cart.label
           }
-          element.push({id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label});
+          element.push({project: project,id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label});
         }
       }
       return element
@@ -120,8 +122,9 @@ async function getRepConfig(){
     const repConfig = await pool.query("SELECT * FROM REPCONFIG LIMIT 1")
     if(repConfig.length!==1){
         throw Error("No hay una configuracion")
-    }
-    return repConfig[0]
+    } else {
+      return repConfig[0]
+  }
 }
 
 //ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
@@ -140,7 +143,10 @@ router.post("/configRepos",async (req,res)=>{
     const infoJson = await info.json();
     var fields = infoJson.data.user.projectV2.fields.nodes;
     if(fields.length>0){
-      //await pool.query("INSERT INTO REPCONFIG(name,token,project) VALUES(?,?,?)",[data.user,data.token,data.project]);
+      const repConfig = await pool.query("SELECT * FROM REPCONFIG")
+      if(repConfig.length==0){
+        await pool.query("INSERT INTO REPCONFIG(name,token,project) VALUES(?,?,?)",[data.user,data.token,data.project]);
+      }
       res.sendStatus(200);
     }
   }catch(e){
@@ -149,8 +155,22 @@ router.post("/configRepos",async (req,res)=>{
   }
 })
 
-router.get("game",async(req,res)=>{
-    
+router.get("/game",async(req,res)=>{
+  try{
+    const headers = {
+      "Content-Type":"application/json",
+      Authorization: `bearer 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`
+    }
+    const info = await fetch(baseUrl,{
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(issues("SiriusBlack430",1))
+    })
+    const infoJson = await info.json();
+    res.send(infoJson)
+  } catch(e){
+    console.log(e);
+  }
 })
 
 router.post("/searchIssue",async(req,res)=>{

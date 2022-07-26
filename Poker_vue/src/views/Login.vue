@@ -7,19 +7,15 @@ export default {
     return {
       username: '',
       password: '',
-      showError: ''
+      showError: false
     }
   },
   methods: {
     async login () {
         try{
-            if(this.username=="" || this.password==""){
-                console.log('No puede haber campos vacios');
-            }else{
-                await LoginAPI(this.username, this.password)
-            }
+            await LoginAPI(this.username, this.password)
         }catch(e){
-            this.showError = e.message
+            this.showError = true
             console.log(e)
         }  
     }
@@ -30,7 +26,9 @@ export default {
 <template>
     <div class="container">
         <h2>LOGIN</h2>
-        <div class="pops" v-if="showError!==''">{{showError}}</div>
+        <div class="pops" v-if="showError"  @click="showError = false">
+            <p>Invalid Data!</p>
+        </div>
         <form @submit.prevent ="login">
             <div class="data">
                 <label for="username">Username:</label>
@@ -40,6 +38,7 @@ export default {
                 placeholder="Enter Username"
                 required
                 v-model="username"
+                @click="showError = false"
                 >
             </div>
             <div class="data">
@@ -50,6 +49,7 @@ export default {
                 name="password" 
                 placeholder="Enter Password"
                 required
+                @click="showError = false"
                 >
             </div>
             <div class="data">

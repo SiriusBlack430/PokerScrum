@@ -9,13 +9,13 @@ export default {
       user:"",
       token:"",
       project:"",
-      showError:false
+      showError:false,
     }
   },
   methods:{
     async connection(){
       try{
-        const next = await repoConfig(this.user,this.token,this.project,this.room);
+        await repoConfig(this.user,this.token,this.project,this.room);
       }catch(e){
         this.showError=true;
         console.log("Error"+e)
@@ -43,7 +43,9 @@ export default {
       <h2>CONFIGURATION</h2>
 
     <!-- <form @submit.prevent="getNamefunction"> -->
-      <div v-if="showError">Error!</div>
+      <div class="pops" v-if="showError"  @click="showError = false">
+            <p>Invalid Data!</p>
+        </div>
       <form @submit.prevent="connection">
         <div class="data">
             <label for="room">Room:</label>
@@ -52,6 +54,7 @@ export default {
             name="room"
             v-model="room"
             placeholder="Enter Game Room"
+            @click="showError = false"
             required
             >
         </div>
@@ -61,6 +64,7 @@ export default {
             type="text" 
             name="repository" 
             placeholder="Enter Repository Name"
+            @click="showError = false"
             v-model="user"
             />
         </div>
@@ -70,6 +74,7 @@ export default {
             type="password" 
             name="token" 
             placeholder="Enter Token"
+            @click="showError = false"
             v-model="token"
             />
         </div>
@@ -79,6 +84,7 @@ export default {
             type="number" 
             name="project" 
             placeholder="Enter Project Number"
+            @click="showError = false"
             v-model="project"
             />
         </div>

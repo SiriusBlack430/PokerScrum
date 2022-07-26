@@ -155,3 +155,13 @@ header, .right > ul {
   height: 4rem;
 }
 
+.pops{
+    text-align: center;
+    background-color: #0d6efd;
+    width:12rem;
+    border-radius: 25px;
+    cursor: pointer;
+}
+.pops > p{
+    color: white;
+}

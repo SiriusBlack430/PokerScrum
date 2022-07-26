@@ -8,26 +8,38 @@ export default{
   data(){
     return{
       issues:[],
+      project: "",
       status: "",
       user: localStorage.getItem('username'),
-      isOpen:false
+      room: localStorage.getItem('room'),
+      isOpen:false,
+      pickcard:false,
+      cards:[
+        {number:0}, {number:1}, {number:2}, {number:3}, {number:5}, {number:8}, {number:13},
+        {number:21}, {number:34}, {number:55}, {number:89},{number:"?"}
+        ]
+    }
+  },
+  async mounted() {
+    try{
+      this.issues = await queryAPI(this.status)
+      this.project = this.issues[0].project
+    } catch(e){
+      console.log(e);
     }
   },
   methods:{
     async query(){
       try{
-        if(this.status===""){
-          console.log("Error")
-          return
-        }
        this.issues = await queryAPI(this.status)
-
       }catch(e){
         console.log("Error")
       }
     }
   }
 }
+const selector = document.querySelectorAll(".card p")
+
 </script>
 
 <template>
@@ -38,11 +50,10 @@ export default{
         <a href="/">
           <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
         </a>
-        <h1></h1>
+        <h1>{{room}}</h1>
       </div>
       <div class="right">
             <ul>
-              <li>{{user}}</li>
               <div class="button-mod">
                 <li> <a href="config">CONFIG</a></li>
               </div>
@@ -58,10 +69,9 @@ export default{
     </div>
     <teleport to="body">
       <div class="show-issues" v-if="isOpen">
-        <div >
-          <div >
-            <h1>Issues from Repository Github</h1>
-            <i @click="isOpen = false" class="fa fa-window-close" aria-hidden="true"></i>
+          <div class="issueshead">
+            <h1>{{project}}</h1>
+            <div @click="isOpen = false" class="close-issues"><p>X</p></div>
           </div>
           <form @submit.prevent="query">
             <div class="data">
@@ -94,21 +104,49 @@ export default{
                 </tbody>
             </table>
           </div>
-        </div>
       </div>
     </teleport>
     <div class="space"></div>
+    <div class="centergame">
+      <p>Feeling lonely?</p>
+      <a> <p>Invite players</p> </a>
+      <div class="reveal">
+        <p v-if="!pickcard">Pick your cards!</p>
+        <div v-if="pickcard" class="button-mod">
+          <li> <a href="">Reveal cards</a></li>
+        </div>
+      </div>
+      <div class="singlecard">
+        <div v-if="!pickcard" id="cardspace"></div>
+        <div v-if="pickcard" id="card"></div>
+        <p>{{user}}</p>
+      </div>
+    </div>
+    <div class="footer-cards">
+      <p>Choose your card 👇</p>
+      <div class="layercard">
+        <div @click="pickcard=true" 
+        class="card" 
+        v-for="{number} in cards" :key="cards.id">
+          <p>{{number}}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style>
+
 .button-mod > li > i {
   font-size: 170%;
   color: white ;
 }
+
 .todo{
-  position: relative;
+  display: flex;
+  flex-direction: column;
 }
+
 .show-issues{
   position: absolute;
   width: 35rem;
@@ -129,6 +167,37 @@ export default{
   z-index: 10;
   overflow: auto;
 }
+
+.show-issues > .issueshead{
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.issueshead > .close-issues{
+  margin: auto;
+  margin-right: 0;
+  height: 50%;
+  width: 10%;
+  border: 1px solid hsla(204,6%,68%,.4);
+  border-radius: 1.5rem;
+}
+
+.issueshead > .close-issues:hover{
+  box-shadow: 0 2px 4px hsla(204,6%,68%,.4);
+  background-color: #f3f4f7;
+  transition: all .09s linear;
+  cursor: pointer;
+}
+
+.close-issues > p {
+  text-align: center;
+  margin: 0;
+  padding: 0.5rem;
+}
+
 .dentro{
   width: 90%;
   margin: auto;
@@ -148,4 +217,100 @@ export default{
   width: 25rem;
   margin-bottom: 1rem;
 }
+
+.centergame{
+  margin: auto;
+  height: 30rem;
+  width: 30rem;
+  text-align: center;
+}
+
+.centergame > .reveal{
+  margin: auto;
+  background-color: #d7e9ff;
+  border-style: solid;
+  border-color: #87b4ec;
+  border-radius: 0.8rem;
+  width: 70%;
+  height: 30%;
+  margin-bottom: 2rem;
+}
+
+.centergame > .reveal > p {
+  line-height: 6rem;
+}
+
+.centergame > .reveal > .button-mod {
+  margin-top: 13%;
+}
+
+.centergame > .card{
+  margin: auto;
+  height: 40%;
+  width: 30%;
+}
+
+.centergame > .singlecard > #card{
+background: linear-gradient(45deg,#3993ff 12%,transparent 0,transparent 88%,#3993ff 0),linear-gradient(135deg,transparent 37%,#1a7bf2 0,#1a7bf2 63%,transparent 0),linear-gradient(45deg,transparent 37%,#3993ff 0,#3993ff 63%,transparent 0),#74b3ff;
+  background-size: auto, auto, auto, auto;
+background-size: 17px 17px;
+border: 1px solid hsla(204,6%,68%,.4);
+border-radius: .6rem;
+box-shadow: 0 2px 4px hsla(204,6%,68%,.4);
+height: 6rem;
+width: 3.5rem;
+margin: auto;
+}
+
+.centergame > .singlecard > #cardspace{
+background: #a9aeb266;
+border: 1px solid hsla(204,6%,68%,.4);
+border-radius: .6rem;
+box-shadow: 0 2px 4px hsla(204,6%,68%,.4);
+height: 6rem;
+width: 3.5rem;
+margin: auto;
+}
+
+.centergame > .singlecard > img{
+  width: 30%;
+}
+
+.centergame > .singlecard > p{
+  font-weight: bold;
+}
+
+.footer-cards{
+  text-align: center;
+  margin: auto;
+  width: 60%;
+  padding: 2rem;
+}
+
+.footer-cards > .layercard{
+  display: flex;
+  justify-content: space-around;
+}
+
+.footer-cards > .layercard > .card{
+  height: 6rem;
+  width: 3.5rem;
+  border: 2px solid #3993ff;
+  cursor: pointer;
+  transition: all .09s linear;
+  border-radius: .8rem;
+  margin: auto;
+}
+
+.footer-cards > .layercard > .card:hover{
+  background-color: #ebf4ff;
+}
+
+.footer-cards > .layercard > .card > p{
+  color: #3993ff;
+  font-weight: 700;
+  align-items: center;
+  margin-top: 2rem
+}
+
 </style>
