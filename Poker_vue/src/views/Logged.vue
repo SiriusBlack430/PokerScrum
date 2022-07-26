@@ -14,14 +14,6 @@ export default {
       const permiss = localStorage.getItem('permiss')
       if(token==null) return;
       if(permiss=='ADMIN') this.showUserList = true;
-      // const response = await axios({
-      //   url: "http://localhost:3001/userList",
-      //   method: "GET",
-      //   headers:{
-      //     Authorization: "Bearer "+token
-      //   }
-      // })
-      // this.User = response.data.User
     }catch(e){
       console.log(e)
     }
@@ -51,7 +43,7 @@ export default {
   </div>
   <div class="space"></div>
   <main>
-    <div class="container">
+    <!-- <div class="container">
       <p>Saved Games</p>
     </div>
     <div class="games">
@@ -85,7 +77,7 @@ export default {
                 <p>20/06/2022</p>
             </a>
         </article>
-    </div>
+    </div> -->
   </main>
 </template>
 

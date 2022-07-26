@@ -9,21 +9,17 @@ export default {
       password: '',
       password2:'',
       showError: false,
-      passwordMatch: true
+      passwordMatch: false
     }
   },
   methods: {
     async register () {
-        try{     
-            if(this.username==="" || this.password==="" || this.password2===""){
-                console.log('No puede haber campos vacios');
+        try{
+            if(this.password === this.password2){
+                await RegisterAPI(this.username, this.password)
             }else{
-                if(this.password === this.password2){
-                    await RegisterAPI(this.username, this.password)
-                }else{
-                    this.passwordMatch = false;
-                }
-            }            
+                this.passwordMatch = true;
+            }
         }catch(e){
             this.showError = true
         }
@@ -36,8 +32,12 @@ export default {
 <template>
 <div class="container">
     <h2>REGISTER</h2>
-    <div v-if="showError">Error</div>
-    <div v-else-if="!passwordMatch">Contraseñas no coinciden</div>
+    <div class="pops" v-if="showError" @click="showError = false">
+        <p>Existing User!</p>
+    </div>
+    <div class="pops" v-else-if="passwordMatch" @click="passwordMatch = false">
+        <p>Passwords do not match</p>
+    </div>
     <form @submit.prevent="register">
         <div class="data">
             <label for="username">Username:</label>
