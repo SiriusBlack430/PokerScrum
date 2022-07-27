@@ -103,11 +103,12 @@ async function getIssue(){
 }
 
 // filter issues by string
-function filterIssues(data,filter){
+function filterIssues(data,status,name){
     let elementFilter=[]
-    if(filter.trim()===""){
+    if(status.trim()==="" && name.trim()===""){
         elementFilter=data
     }else {
+      
       for(let i=0;i<element.length;i++){
         if(data[i].status.toLowerCase().trim() == filter.toLowerCase().trim()){
           elementFilter.push(data[i])
@@ -126,6 +127,7 @@ async function getRepConfig(){
       return repConfig[0]
   }
 }
+
 router.get("/getRepoConfig",async(req,res)=>{
   try{
     const data = await getRepConfig()
@@ -136,6 +138,7 @@ router.get("/getRepoConfig",async(req,res)=>{
   }
 })
 //ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
+
 router.post("/configRepos",async (req,res)=>{
   var data = req.body;
   try{
@@ -164,29 +167,15 @@ router.post("/configRepos",async (req,res)=>{
 })
 
 router.get("/game",async(req,res)=>{
-  try{
-    const headers = {
-      "Content-Type":"application/json",
-      Authorization: `bearer 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`
-    }
-    const info = await fetch(baseUrl,{
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(issues("SiriusBlack430",1))
-    })
-    const infoJson = await info.json();
-    res.send(infoJson)
-  } catch(e){
-    console.log(e);
-  }
 })
 
 router.post("/searchIssue",async(req,res)=>{
-    busqueda = req.body.status;
-    if(element.length===0 || req.body.refresh){
+    var status = req.body.status;
+    var name = req.body.name;
+    if(element.length===0){
         await getIssue()
     }
-    const filteredData = filterIssues(element,busqueda)
+    const filteredData = filterIssues(element,status,name)
     res.send(filteredData)
 })
 
