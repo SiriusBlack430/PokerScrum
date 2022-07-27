@@ -1,5 +1,5 @@
 <script>
-import {repoConfig} from "../store/query/actions"
+import {repoConfig, getRepoConfig} from "../store/query/actions"
 import router from "../router";
 export default{
     name: 'Config',
@@ -8,6 +8,16 @@ export default{
             usuario:'',
             token:'',
             project:''
+        }
+    },
+    async mounted(){
+        try{
+            const data = await getRepoConfig()
+            this.usuario = data.name
+            this.token = data.token
+            this.project = data.project
+        }catch(e){
+            console.log("Error " + e)
         }
     },
     methods:{

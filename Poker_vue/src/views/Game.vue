@@ -22,7 +22,7 @@ export default{
       this.project = this.issues[0].project
       this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){
-      console.log(e);
+      console.log("ERROR MOUNTED"+e);
     }
   },
   methods:{
@@ -30,11 +30,19 @@ export default{
       try{
        this.issues = await queryAPI(this.statusIssue,this.nameIssue)
       }catch(e){
-        console.log("Error")
+        console.log("Error " + e)
+      }
+    },
+    async refresh(){
+      try{
+        this.issues = await queryAPI("",true)
+      }catch(e){
+        console.log("ERROR REFRESH "+e)
       }
     }
   }
 }
+
 
 </script>
 
@@ -49,9 +57,13 @@ export default{
         <h1>{{room}}</h1>
       </div>
       <div class="right">
-            <ul>
+            <ul>              
               <div class="button-mod">
-                <li> <a href="#">New Players</a></li>
+                <li> <a href="config">CONFIG</a></li>
+              </div>   
+              <div class="button-mod">
+                <li> <a href="#">Invite Players</a></li>
+
               </div>
               <div class="button-mod" @click="isOpen=true">
                 <li> <i class="fa fa-bars" aria-hidden="true"></i></li>
@@ -64,10 +76,17 @@ export default{
       <div class="show-issues" v-if="isOpen">
           <div class="issueshead">
             <h1>{{project}}</h1>
-            <div @click="isOpen = false" class="close-issues"><p>X</p></div>
+            <div  class="close-issues" @click="refresh">
+              <p class=reload>&#x21bb;</p>
+            </div>
+            <div @click="isOpen = false" class="close-issues">
+              <p>X</p>
+            </div>    
+            
           </div>
           <form @submit.prevent="query">
             <div class="data">
+
               <div id="select-input">
                 <select v-model="statusIssue">
                   <option v-for="status in statusFilter"  :selected="status" >{{status}}</option>
@@ -89,8 +108,8 @@ export default{
                     </tr>
                 </thead>
                 <tbody v-for="{title,status,label} in issues" :key="issues.id">
-                    <tr >
-                        <td>{{title}}</td> 
+                    <tr>
+                        <td class="titulo" @click="this.actualIssue=title"><a>{{title}}</a></td> 
                         <td>{{status}}</td>
                         <td>{{label}}</td>
                     </tr>
@@ -101,12 +120,13 @@ export default{
     </teleport>
     <div class="space"></div>
     <div class="centergame">
-      <p>Feeling lonely?</p>
-      <a> <p>Invite players</p> </a>
+      <h1 v-if="actualIssue==''">Choose Issue</h1>
+      <h1 v-else>{{actualIssue}}</h1>
+
       <div class="reveal">
         <p v-if="!pickcard">Pick your cards!</p>
         <div v-if="pickcard" class="button-mod">
-          <li> <a href="">Reveal cards</a></li>
+          <li> <a >Reveal cards</a></li>
         </div>
       </div>
       <div class="singlecard">
@@ -136,6 +156,16 @@ export default{
 </template>
 
 <style>
+
+
+.titulo a{
+  cursor: pointer;
+}
+.reload{
+   font-family: Lucida Sans Unicode,
+}
+
+
 .button-mod > li > i {
   font-size: 170%;
   color: white ;
