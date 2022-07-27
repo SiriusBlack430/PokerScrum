@@ -128,6 +128,16 @@ async function getRepConfig(){
   }
 }
 
+router.get("/getRepoConfig",async(req,res)=>{
+  try{
+    const data = await getRepConfig()
+    res.send(data)
+  }catch(e){
+    console.log(e)
+    res.sendStatus(404)
+  }
+})
+//ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
 
 router.post("/configRepos",async (req,res)=>{
   var data = req.body;

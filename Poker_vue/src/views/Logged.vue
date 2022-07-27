@@ -34,9 +34,8 @@ export default {
           <ul>
             <li v-if="showUserList"> <a href="userlist">USERLIST</a></li>
             <li> <a href="/">LOGOUT</a></li>
-            <div class="button-mod">
-              <li> <a href="creategame">START NEW GAME</a></li>
-            </div>
+            <li> <a type="button"  href="creategame" >START NEW GAME</a></li>
+
           </ul>
         </div>
       </header>
