@@ -13,34 +13,37 @@ export default{
       user: localStorage.getItem('username'),
       room: localStorage.getItem('room'),
       isOpen:false,
-      pickcard:false
+      pickcard:false,
+      actualIssue:""
     }
   },
   async mounted() {
     try{
-      this.issues = await queryAPI(this.statusIssue,this.name)
+      this.issues = await queryAPI(this.statusIssue,this.nameIssue,false)
       this.project = this.issues[0].project
       this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){
-      console.log("ERROR MOUNTED"+e);
+        console.log("Error " + e)
+  
     }
   },
   methods:{
     async query(){
       try{
-       this.issues = await queryAPI(this.statusIssue,this.nameIssue)
+       this.issues = await queryAPI(this.statusIssue,this.nameIssue,false)
       }catch(e){
         console.log("Error " + e)
       }
     },
     async refresh(){
       try{
-        this.issues = await queryAPI("",true)
+        this.issues = await queryAPI("","",true)
       }catch(e){
         console.log("ERROR REFRESH "+e)
       }
     }
   }
+    
 }
 
 
@@ -63,7 +66,6 @@ export default{
               </div>   
               <div class="button-mod">
                 <li> <a href="#">Invite Players</a></li>
-
               </div>
               <div class="button-mod" @click="isOpen=true">
                 <li> <i class="fa fa-bars" aria-hidden="true"></i></li>
@@ -86,9 +88,9 @@ export default{
           </div>
           <form @submit.prevent="query">
             <div class="data">
-
               <div id="select-input">
                 <select v-model="statusIssue">
+
                   <option v-for="status in statusFilter"  :selected="status" >{{status}}</option>
                 </select>
                 <input type="text" name="username" placeholder="Enter Status" v-model="nameIssue">

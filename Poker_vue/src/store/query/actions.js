@@ -2,7 +2,7 @@ import axios from "axios";
 import router from "../../router";
 
 
-export async function queryAPI(status,name){
+export async function queryAPI(status,name,refresh){
 
     try{
         const data = await axios({
@@ -10,7 +10,8 @@ export async function queryAPI(status,name){
             method: "POST",
             data:{
                 status: status,
-                name: name
+                name: name,
+                refresh
             }
         })
         return data.data
