@@ -127,6 +127,10 @@ async function getRepConfig(){
       return repConfig[0]
   }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> db111f3a6b76c260362990f944f1e8fed003c58d
 router.get("/getRepoConfig",async(req,res)=>{
   try{
     const data = await getRepConfig()
@@ -137,6 +141,10 @@ router.get("/getRepoConfig",async(req,res)=>{
   }
 })
 //ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
+<<<<<<< HEAD
+=======
+
+>>>>>>> db111f3a6b76c260362990f944f1e8fed003c58d
 router.post("/configRepos",async (req,res)=>{
   var data = req.body;
   try{

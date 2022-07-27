@@ -27,7 +27,14 @@ export default{
   
     }
   },
-  methods: {
+  methods:{
+    async query(){
+      try{
+       this.issues = await queryAPI(this.statusIssue,this.nameIssue)
+      }catch(e){
+        console.log("Error " + e)
+      }
+    },
     async refresh(){
       try{
         this.issues = await queryAPI("",true)
@@ -38,6 +45,7 @@ export default{
   },
     
   }
+}
 
 
 </script>
@@ -150,6 +158,16 @@ export default{
 </template>
 
 <style>
+
+
+.titulo a{
+  cursor: pointer;
+}
+.reload{
+   font-family: Lucida Sans Unicode,
+}
+
+
 .button-mod > li > i {
   font-size: 170%;
   color: white ;
