@@ -108,9 +108,8 @@ function filterIssues(data,status,name){
     if(status.trim()==="" && name.trim()===""){
         elementFilter=data
     }else {
-      
       for(let i=0;i<element.length;i++){
-        if(data[i].status.toLowerCase().trim() == filter.toLowerCase().trim()){
+        if(data[i].status.toLowerCase().trim() == status.toLowerCase().trim()){
           elementFilter.push(data[i])
         }
       }
@@ -127,10 +126,6 @@ async function getRepConfig(){
       return repConfig[0]
   }
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> db111f3a6b76c260362990f944f1e8fed003c58d
 router.get("/getRepoConfig",async(req,res)=>{
   try{
     const data = await getRepConfig()
@@ -141,10 +136,6 @@ router.get("/getRepoConfig",async(req,res)=>{
   }
 })
 //ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
-<<<<<<< HEAD
-=======
-
->>>>>>> db111f3a6b76c260362990f944f1e8fed003c58d
 router.post("/configRepos",async (req,res)=>{
   var data = req.body;
   try{
@@ -178,7 +169,8 @@ router.get("/game",async(req,res)=>{
 router.post("/searchIssue",async(req,res)=>{
     var status = req.body.status;
     var name = req.body.name;
-    if(element.length===0){
+    let refresh = req.body.refresh
+    if(element.length===0 || refresh){
         await getIssue()
     }
     const filteredData = filterIssues(element,status,name)
