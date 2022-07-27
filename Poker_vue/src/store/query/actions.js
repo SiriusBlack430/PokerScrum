@@ -8,7 +8,7 @@ export async function queryAPI(status,refresh){
             method: "POST",
             data:{
                 status: status,
-                refresh
+                refresh: refresh
             }
         })
         return data.data

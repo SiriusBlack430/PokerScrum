@@ -15,6 +15,8 @@ export default{
       isOpen:false,
       pickcard:false,
       actualIssue:"",
+      statusFilter: [],
+      selected:"",
       cards:[
         {number:0}, {number:1}, {number:2}, {number:3}, {number:5}, {number:8}, {number:13},
         {number:21}, {number:34}, {number:55}, {number:89},{number:"?"}
@@ -25,15 +27,17 @@ export default{
     try{
       this.issues = await queryAPI(this.status,false)
       this.project = this.issues[0].project
-      console.log(this.project)
+      this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
+  
     } catch(e){
-      console.log(e);
+      console.log("ERROR MOUNTED"+e);
     }
   },
   methods:{
     async query(){
       try{
-       this.issues = await queryAPI(this.status,false)
+       //this.issues = await queryAPI(this.status,false)
+       console.log(this.selected)
       }catch(e){
         console.log("Error " + e)
       }
@@ -42,7 +46,7 @@ export default{
       try{
         this.issues = await queryAPI("",true)
       }catch(e){
-        console.log(e)
+        console.log("ERROR REFRESH "+e)
       }
     }
   }
@@ -85,17 +89,17 @@ export default{
             </div>
             <div @click="isOpen = false" class="close-issues">
               <p>X</p>
-            </div>
+            </div>    
             
           </div>
           <form @submit.prevent="query">
             <div class="data">
-                <input 
-                type="text" 
-                name="username" 
-                placeholder="Enter Status" 
-                v-model="status"
-                >
+              <div>
+               <select v-model="selected">
+                  <option v-for="statusF in statusFilter">{{statusF}}</option>
+                </select> 
+                <input type="text" name="username" placeholder="Enter Status" v-model="status">
+              </div>
             </div>
             <div class="data">
                 <button type="submit">Search</button>
