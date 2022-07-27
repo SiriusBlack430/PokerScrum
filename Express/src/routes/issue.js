@@ -108,10 +108,11 @@ function filterIssues(data,status,name){
     if(status.trim()==="" && name.trim()===""){
         elementFilter=data
     }else {
-      
-      for(let i=0;i<element.length;i++){
-        if(data[i].status.toLowerCase().trim() == filter.toLowerCase().trim()){
-          elementFilter.push(data[i])
+      if(status.trim()!=="" && name.trim()===""){
+        for(let i=0;i<element.length;i++){
+          if(data[i].status.toLowerCase().trim() == status.toLowerCase().trim()){
+            elementFilter.push(data[i])
+          }
         }
       }
     }  
