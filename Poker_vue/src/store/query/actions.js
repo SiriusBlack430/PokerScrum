@@ -1,13 +1,14 @@
 import axios from "axios";
 import router from "../../router";
 
-export async function queryAPI(status){
+export async function queryAPI(status,name){
     try{
         const data = await axios({
             url: "http://localhost:3001/searchIssue",
             method: "POST",
             data:{
-                status: status
+                status: status,
+                name: name
             }
         })
         return data.data

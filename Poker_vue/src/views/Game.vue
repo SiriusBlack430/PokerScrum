@@ -1,7 +1,5 @@
 <script>
-
 import {queryAPI} from '../store/query/actions'
-
 
 export default{
   name: "Query",
@@ -9,21 +7,20 @@ export default{
     return{
       issues:[],
       project: "",
-      status: "",
+      nameIssue: "",
+      statusFilter:[],
+      statusIssue:"",
       user: localStorage.getItem('username'),
       room: localStorage.getItem('room'),
       isOpen:false,
-      pickcard:false,
-      cards:[
-        {number:0}, {number:1}, {number:2}, {number:3}, {number:5}, {number:8}, {number:13},
-        {number:21}, {number:34}, {number:55}, {number:89},{number:"?"}
-        ]
+      pickcard:false
     }
   },
   async mounted() {
     try{
-      this.issues = await queryAPI(this.status)
+      this.issues = await queryAPI(this.statusIssue,this.name)
       this.project = this.issues[0].project
+      this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){
       console.log(e);
     }
@@ -31,14 +28,13 @@ export default{
   methods:{
     async query(){
       try{
-       this.issues = await queryAPI(this.status)
+       this.issues = await queryAPI(this.statusIssue,this.nameIssue)
       }catch(e){
         console.log("Error")
       }
     }
   }
 }
-const selector = document.querySelectorAll(".card p")
 
 </script>
 
@@ -54,9 +50,6 @@ const selector = document.querySelectorAll(".card p")
       </div>
       <div class="right">
             <ul>
-              <div class="button-mod">
-                <li> <a href="config">CONFIG</a></li>
-              </div>
               <div class="button-mod">
                 <li> <a href="#">New Players</a></li>
               </div>
@@ -75,12 +68,12 @@ const selector = document.querySelectorAll(".card p")
           </div>
           <form @submit.prevent="query">
             <div class="data">
-                <input 
-                type="text" 
-                name="username" 
-                placeholder="Enter Status" 
-                v-model="status"
-                >
+              <div id="select-input">
+                <select v-model="statusIssue">
+                  <option v-for="status in statusFilter"  :selected="status" >{{status}}</option>
+                </select>
+                <input type="text" name="username" placeholder="Enter Status" v-model="nameIssue">
+              </div>
             </div>
             <div class="data">
                 <button type="submit">Search</button>
@@ -125,18 +118,24 @@ const selector = document.querySelectorAll(".card p")
     <div class="footer-cards">
       <p>Choose your card 👇</p>
       <div class="layercard">
-        <div @click="pickcard=true" 
-        class="card" 
-        v-for="{number} in cards" :key="cards.id">
-          <p>{{number}}</p>
-        </div>
+        <div @click="pickcard=true" class="card"> <p>0</p> </div>
+        <div @click="pickcard=true" class="card"> <p>1</p> </div>
+        <div @click="pickcard=true" class="card"> <p>2</p> </div>
+        <div @click="pickcard=true" class="card"> <p>3</p> </div>
+        <div @click="pickcard=true" class="card"> <p>5</p> </div>
+        <div @click="pickcard=true" class="card"> <p>8</p> </div>
+        <div @click="pickcard=true" class="card"> <p>13</p> </div>
+        <div @click="pickcard=true" class="card"> <p>21</p> </div>
+        <div @click="pickcard=true" class="card"> <p>34</p> </div>
+        <div @click="pickcard=true" class="card"> <p>55</p> </div>
+        <div @click="pickcard=true" class="card"> <p>89</p> </div>
+        <div @click="pickcard=true" class="card"> <p>?</p> </div>
       </div>
     </div>
   </div>
 </template>
 
 <style>
-
 .button-mod > li > i {
   font-size: 170%;
   color: white ;
@@ -171,7 +170,7 @@ const selector = document.querySelectorAll(".card p")
 .show-issues > .issueshead{
   display: flex;
   justify-content: space-between;
-  width: 90%;
+  width: 80%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -313,4 +312,19 @@ margin: auto;
   margin-top: 2rem
 }
 
+.show-issues > form > .data{
+  margin: auto;
+  width: 80%;
+}
+
+.data > #select-input{
+  display: flex;
+}
+
+.data > #select-input > select{
+  width: 25%;
+}
+.data > #select-input > input{
+  width: 75%;
+}
 </style>
