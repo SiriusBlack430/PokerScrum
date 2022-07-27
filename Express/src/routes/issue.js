@@ -108,13 +108,13 @@ function filterIssues(data,status,name){
     if(status.trim()==="" && name.trim()===""){
         elementFilter=data
     }else {
-      if(status.trim()!=="" && name.trim()===""){
+      // if(status.trim()!=="" && name.trim()===""){
         for(let i=0;i<element.length;i++){
           if(data[i].status.toLowerCase().trim() == status.toLowerCase().trim()){
             elementFilter.push(data[i])
           }
         }
-      }
+      // }
     }  
     return elementFilter
 }

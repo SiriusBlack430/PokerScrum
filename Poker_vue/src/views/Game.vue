@@ -10,6 +10,7 @@ export default{
       nameIssue: "",
       statusFilter:[],
       statusIssue:"",
+      actualIssue:"",
       user: localStorage.getItem('username'),
       room: localStorage.getItem('room'),
       isOpen:false,
@@ -18,7 +19,7 @@ export default{
   },
   async mounted() {
     try{
-      this.issues = await queryAPI(this.statusIssue,this.name)
+      this.issues = await queryAPI(this.statusIssue,this.nameIssue)
       this.project = this.issues[0].project
       this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){

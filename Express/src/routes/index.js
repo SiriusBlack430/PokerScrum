@@ -33,8 +33,8 @@ function authenticateToken(req,res,next){
 router.post('/log',async (req,res)=>{
     const data = req.body
     const User = await pool.query("SELECT * FROM USER WHERE username= ?",data.username)
+    console.log(User);
     if(User.length==0){
-        //res.status(404).send("usuario no existe")
         res.sendStatus(404)
     }else{
         const compare = await bcrypt.compare(data.password,User[0].password)
@@ -43,7 +43,6 @@ router.post('/log',async (req,res)=>{
             const permiss = User[0].permiss
             res.send({token, permiss})
         }else{
-            //res.status(404).send("contraseña erronea")
             res.sendStatus(404)
         }  
     }
