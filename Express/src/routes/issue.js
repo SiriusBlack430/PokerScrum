@@ -2,128 +2,197 @@ const express = require('express')
 const router = express.Router()
 const fetch = require('node-fetch')
 const pool = require("./conectionMysql")
+const uuid = require('uuid');
+var os = require('os');
+const fs = require('fs');
+var path = require('path');
 
 const baseUrl = "https://api.github.com/graphql"; // url api github
 let cart={},element=[]
 // return query graphql api
 function issues(user,projectNum){
-    return{
-      "query":`
-      query{
-        user(login:"${user}"){
-          projectV2(number:${projectNum}){
-            title
-            fields(first:20){
-              nodes{
-                ... on ProjectV2SingleSelectField{
+  return{
+    "query":`
+    query{
+      user(login:"`+user+`"){
+        projectV2(number:`+projectNum+`){
+          title
+          fields(first:20){
+            nodes{
+              ... on ProjectV2SingleSelectField{
+                name
+                options{
                   name
-                  options{
+                }
+              }
+            }
+          }
+          items(first:50){
+            nodes{
+              fieldValues(first: 20) {
+                nodes{
+                  ... on ProjectV2ItemFieldSingleSelectValue{
                     name
                   }
                 }
               }
-            }
-            items(first:20){
-              nodes{
-                fieldValues(first: 8) {
-                  nodes{
-                    ... on ProjectV2ItemFieldSingleSelectValue{
+              content{
+                __typename
+                ... on Issue{
+                  number
+                  title
+                  labels(first:10){
+                    nodes{
                       name
                     }
                   }
-                }
-                content{
-                    __typename
-                    ... on Issue{
-                    number
-                    title
-                    labels(first:20){
-                      nodes{
-                        name
-                      }
+                  bodyUrl
+                  comments(first:5){
+                    nodes{
+                      bodyText
                     }
-                    bodyUrl
+                  }
+                  assignees(first:5){
+                    nodes{
+                      login
+                    }
+                  }
+                  participants(first:5){
+                    nodes{
+                      login
+                    }
                   }
                 }
               }
             }
           }
         }
-      }`,
-    }
+      }
+    }`,
+  }
 }
 
 // filter all data that return github and return an js object of issues
 async function getIssue(){
-    element=[],cart = {}
-    try{
-      const data = await getRepConfig()
-      const headers = {
-        "Content-Type":"application/json",
-        Authorization: `bearer ${data.token}`
-      }
-      const info = await fetch(baseUrl,{
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(issues(data.name,data.project))
-      })
-      const infoJson = await info.json();
-      let fields = infoJson.data.user.projectV2.fields.nodes;
-      var project = infoJson.data.user.projectV2.title;
-      let statusNames;
-      for(let i=0;i<fields.length;i++){
-        if(fields[i].name === "Status"){
-          statusNames = fields[i].options
-        }
-      }
-      let items = infoJson.data.user.projectV2.items.nodes;
-      for(let i=0; i<items.length; i++){
-        for(let j=0; j<items[i].fieldValues.nodes.length; j++){
-          for(let k=0; k<statusNames.length; k++){
-            if(statusNames[k].name === items[i].fieldValues.nodes[j].name){
-              cart.status = items[i].fieldValues.nodes[j].name
-            }
-          }
-        }
-        cart.label=""
-        if(items[i].content.__typename==="Issue"){ 
-          cart.id = items[i].content.number
-          cart.title = items[i].content.title
-          cart.url = items[i].content.bodyUrl
-          for(let l=0; l<items[i].content.labels.nodes.length; l++){
-              cart.label = items[i].content.labels.nodes[l].name+" "+cart.label
-          }
-          element.push({project: project,id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label});
-        }
-      }
-      return element
-    }catch(e){
-      console.log(e)
+  element=[],cart = {}
+  try{
+    const data = await getRepConfig()
+    const headers = {
+      "Content-Type":"application/json",
+      Authorization: `bearer ${data.token}`
     }
+    const info = await fetch(baseUrl,{
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(issues(data.name,data.project))
+    })
+    const infoJson = await info.json();
+    let fields = infoJson.data.user.projectV2.fields.nodes;
+    cart.project = infoJson.data.user.projectV2.title;
+    let statusNames;
+    for(let i=0;i<fields.length;i++){
+      if(fields[i].name === "Status"){
+        statusNames = fields[i].options
+      }
+    }
+    let items = infoJson.data.user.projectV2.items.nodes;
+    for(let i=0; i<items.length; i++){
+      for(let j=0; j<items[i].fieldValues.nodes.length; j++){
+        for(let k=0; k<statusNames.length; k++){
+          if(statusNames[k].name === items[i].fieldValues.nodes[j].name){
+            cart.status = items[i].fieldValues.nodes[j].name
+          }
+        }
+      }
+      cart.label=""
+      cart.comment=""
+      cart.assign=""
+      cart.participant=""
+      if(items[i].content.__typename==="Issue"){
+        cart.id = items[i].content.number
+        cart.title = items[i].content.title
+        cart.url = items[i].content.bodyUrl
+        for(var l=0; l<items[i].content.labels.nodes.length; l++){
+          cart.label = items[i].content.labels.nodes[l].name+", "+cart.label
+        }
+        for(var l=0; l<items[i].content.comments.nodes.length; l++){
+          cart.comment = "'"+items[i].content.comments.nodes[l].bodyText+"', "+cart.comment
+        }
+        for(var l=0; l<items[i].content.assignees.nodes.length; l++){
+          cart.assign = items[i].content.assignees.nodes[l].login+", "+cart.assign
+        }
+        for(var l=0; l<items[i].content.participants.nodes.length; l++){
+          cart.participant = items[i].content.participants.nodes[l].login+", "+cart.participant
+        }
+        element.push({project: cart.project,id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label,comment: cart.comment,assign: cart.assign,participant: cart.participant});
+      }
+    }
+    return element
+  }catch(e){
+    console.log(e)
+  }
 }
 
 // filter issues by string
 function filterIssues(data,status,name){
-    let elementFilter=[]
-    if(status.trim()==="" && name.trim()===""){
-        elementFilter=data
-    }else {
+  let elementFilter=[]
+  let filterStatusName=[]
+  if(status.trim()==="" && name.trim()===""){
+    elementFilter=data
+  }else {
+    if(status.trim()!=="" && status!=="all"){
       for(let i=0;i<element.length;i++){
         if(data[i].status.toLowerCase().trim() == status.toLowerCase().trim()){
           elementFilter.push(data[i])
         }
-      // }
-    }  
-    return elementFilter
+      }
+      if(name.trim()!==""){
+        for(var j=0; j<elementFilter.length; j++){
+          if(elementFilter[j].title.toLowerCase().trim().includes(name.toLowerCase().trim())){
+            filterStatusName.push(elementFilter[j])
+          }
+        }
+        elementFilter=filterStatusName
+      }
+    } else{
+      for(var j=0; j<data.length; j++){
+        if(data[j].title.toLowerCase().trim().includes(name.toLowerCase().trim())){
+          filterStatusName.push(data[j])
+        }
+      }
+      elementFilter=filterStatusName
+    }
+  }
+  return elementFilter
+}
+
+async function imprimir(element){
+  const file = uuid.v4()+'.csv'
+  var dir = path.join(os.tmpdir(),file)
+  var string="ID, Name Issues, Status, Labels, Comments, Assignees, Participants \n"
+  for(var i=0;i<element.length;i++){
+    string = string+element[i].id+', '+element[i].title+', '+element[i].status+', '+element[i].label+', '+element[i].comment+', '+element[i].assign+', '+element[i].participant+'\n'
+  }
+  fs.writeFileSync(dir, string,
+    {
+      encoding: "utf8",
+      mode: 0o666
+    },
+    (err) => {
+      if (err)
+      console.log(err);
+      else { console.log("File written successfully\n"); }
+    });
+    return dir
 }
 
 // get repository configuration from mysql
 async function getRepConfig(){
-    const repConfig = await pool.query("SELECT * FROM REPCONFIG LIMIT 1")
-    if(repConfig.length!==1){
-        throw Error("No hay una configuracion")
-    } else {
-      return repConfig[0]
+  const repConfig = await pool.query("SELECT * FROM REPCONFIG LIMIT 1")
+  if(repConfig.length!==1){
+    throw Error("No hay una configuracion")
+  } else {
+    return repConfig[0]
   }
 }
 router.get("/getRepoConfig",async(req,res)=>{
@@ -135,6 +204,7 @@ router.get("/getRepoConfig",async(req,res)=>{
     res.sendStatus(404)
   }
 })
+
 //ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
 router.post("/configRepos",async (req,res)=>{
   var data = req.body;
@@ -167,14 +237,19 @@ router.get("/game",async(req,res)=>{
 })
 
 router.post("/searchIssue",async(req,res)=>{
-    var status = req.body.status;
-    var name = req.body.name;
-    let refresh = req.body.refresh
-    if(element.length===0 || refresh){
-        await getIssue()
-    }
-    const filteredData = filterIssues(element,status,name)
-    res.send(filteredData)
+  var status = req.body.status;
+  var name = req.body.name;
+  let refresh = req.body.refresh
+  if(element.length===0 || refresh){
+    await getIssue()
+  }
+  const filteredData = filterIssues(element,status,name)
+  res.send(filteredData)
 })
 
+router.post("/export", async(req,res)=>{
+  var elementFilter = req.body.issues
+  var download = await imprimir(elementFilter)
+  res.download(download)
+})
 module.exports = router

@@ -52,12 +52,14 @@ table{
     width: 80%;
     border: 0.15rem solid;
     border-color: #dee2e6;
-    text-align: left;
 }
 th, td{
     padding: 0.40rem;
     border: 0.1rem solid;
     border-color: #dee2e6;
+}
+td{
+    text-align: left;
 }
 .menu-container {
     top:0;
