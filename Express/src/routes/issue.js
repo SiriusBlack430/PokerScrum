@@ -252,4 +252,37 @@ router.post("/export", async(req,res)=>{
   var download = await imprimir(elementFilter)
   res.download(download)
 })
+
+// itemId es el id de issue dentro de projectV2, fieldId es el id de valoracion
+function mutation(){
+  return{
+    "query":`
+    mutation {
+      updateProjectV2ItemFieldValue(
+        input: {projectId: "PVT_kwHOBQI_A84ACKFd", itemId: "PVTI_lAHOBQI_A84ACKFdzgBhM-s", fieldId: "PVTF_lAHOBQI_A84ACKFdzgBP1IA", value: {number: 50}}
+      ) {
+        clientMutationId
+      }
+    }`,
+  }
+}
+//token  ghp_LUsFedtFM7gzvZnQ   Tr8t3lXUnuUg213LcKoa
+router.get("/",async(req,res)=>{
+  try{
+    const headers = {
+      "Content-Type":"application/json",
+      Authorization: `bearer ` // token
+    }
+    const info = await fetch(baseUrl,{
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(mutation())
+    })
+    const infoJson = await info.json();
+    console.log(infoJson)
+    res.send(infoJson)
+  }catch(e){
+    console.log(e)
+  }
+})
 module.exports = router
