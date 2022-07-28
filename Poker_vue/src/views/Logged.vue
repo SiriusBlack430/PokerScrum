@@ -42,59 +42,39 @@ export default {
   </div>
   <div class="space"></div>
   <main>
-    <!-- <div class="container">
-      <p>Saved Games</p>
+    <div class="maintenance">
+      <h1>Page in Maintenance</h1>
+      <div class="games">
+        <img src="https://www.clipartkey.com/mpngs/m/184-1849588_maintenance-website-landing-page.png" alt="centro">
+      </div>
     </div>
-    <div class="games">
-        <article>
-            <a href="#">
-                <p>Sesión 1</p>
-                <p>18/06/2022</p>
-            </a>
-        </article>
-        <article>
-            <a href="#">
-                <p>Sesión</p>
-                <p>20/06/2022</p>
-            </a>
-        </article>
-        <article>
-            <a href="#">
-                <p>Sesión</p>
-                <p>20/06/2022</p>
-            </a>
-        </article>
-        <article>
-            <a href="#">
-                <p>Sesión</p>
-                <p>20/06/2022</p>
-            </a>
-        </article>
-        <article>
-            <a href="#">
-                <p>Sesión</p>
-                <p>20/06/2022</p>
-            </a>
-        </article>
-    </div> -->
   </main>
 </template>
 
 <style>
-.games{
-    width: 90%;
-    margin: auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-
+main{
+  width:100%
 }
-.games > article{
-    width: 15rem;
-    border: 0.2rem solid #3993ff;
-    border-radius: 0.7rem;
-    margin-top: 2rem;
-    box-sizing: content-box;
-    text-align: center;
+
+.maintenance{
+  width: 80rem;
+  margin: auto;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+.maintenance > h1{
+  margin-top: 10rem;
+}
+
+.games{
+    width: 50%;
+    box-shadow: 0 4px 8px hsla(204,6%,68%,.4);
+    border-radius: 1.5rem;
+}
+
+.games > img{
+  width:100%;
 }
 </style>
