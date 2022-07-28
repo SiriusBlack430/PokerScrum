@@ -9,6 +9,7 @@ var path = require('path');
 
 const baseUrl = "https://api.github.com/graphql"; // url api github
 let cart={},element=[]
+
 // return query graphql api
 function issues(user,projectNum){
   return{
@@ -16,6 +17,7 @@ function issues(user,projectNum){
     query{
       user(login:"`+user+`"){
         projectV2(number:`+projectNum+`){
+          id
           title
           fields(first:20){
             nodes{
@@ -25,6 +27,10 @@ function issues(user,projectNum){
                   name
                 }
               }
+              ... on ProjectV2Field{
+                id
+                name
+              }
             }
           }
           items(first:50){
@@ -32,6 +38,7 @@ function issues(user,projectNum){
               fieldValues(first: 20) {
                 nodes{
                   ... on ProjectV2ItemFieldSingleSelectValue{
+                    id
                     name
                   }
                 }
@@ -127,7 +134,8 @@ async function getIssue(){
         element.push({project: cart.project,id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label,comment: cart.comment,assign: cart.assign,participant: cart.participant});
       }
     }
-    return element
+    //return element
+    return infoJson
   }catch(e){
     console.log(e)
   }
@@ -195,6 +203,7 @@ async function getRepConfig(){
     return repConfig[0]
   }
 }
+
 router.get("/getRepoConfig",async(req,res)=>{
   try{
     const data = await getRepConfig()
@@ -205,7 +214,7 @@ router.get("/getRepoConfig",async(req,res)=>{
   }
 })
 
-//ghp_BTv8SkRemnGiQcNdmJIl7   KiP9i0DpJ0xADNk
+
 router.post("/configRepos",async (req,res)=>{
   var data = req.body;
   try{
@@ -234,6 +243,10 @@ router.post("/configRepos",async (req,res)=>{
 })
 
 router.get("/game",async(req,res)=>{
+})
+
+router.get("/mutation",async(req,res)=>{
+  res.send(await getIssue())  
 })
 
 router.post("/searchIssue",async(req,res)=>{
