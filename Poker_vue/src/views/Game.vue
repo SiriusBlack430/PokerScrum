@@ -13,6 +13,7 @@ export default{
       statusFilter:[],
       statusIssue:"",
       actualIssue:"",
+      actualIssueLink:"",
       user: localStorage.getItem('username'),
       room: localStorage.getItem('room'),
       issueOpen:false,
@@ -120,9 +121,9 @@ export default{
                         <th scope="col">Label</th>
                     </tr>
                 </thead>
-                <tbody v-for="{title,status,label} in issues" :key="issues.id">
+                <tbody v-for="{title,status,label,url} in issues" :key="issues.id">
                     <tr>
-                        <td class="titulo" @click="actualIssue=title"><a>{{title}}</a></td> 
+                        <td class="titulo" @click="actualIssue=title, actualIssueLink=url"><a>{{title}}</a></td> 
                         <td>{{status}}</td>
                         <td>{{label}}</td>
                     </tr>
@@ -175,7 +176,7 @@ export default{
     <div class="space"></div>
     <div class="centergame">
       <h1 v-if="actualIssue==''">Choose Issue</h1>
-      <h1 v-else>{{actualIssue}}</h1>
+      <h1 v-else><a :href="actualIssueLink" target="_blank">{{actualIssue}}</a></h1>
 
       <div class="reveal">
         <p v-if="!pickcard">Pick your cards!</p>
@@ -192,18 +193,14 @@ export default{
     <div class="footer-cards">
       <p>Choose your card 👇</p>
       <div class="layercard">
-        <div @click="pickcard=true" class="card"> <p>0</p> </div>
-        <div @click="pickcard=true" class="card"> <p>1</p> </div>
-        <div @click="pickcard=true" class="card"> <p>2</p> </div>
-        <div @click="pickcard=true" class="card"> <p>3</p> </div>
-        <div @click="pickcard=true" class="card"> <p>5</p> </div>
-        <div @click="pickcard=true" class="card"> <p>8</p> </div>
-        <div @click="pickcard=true" class="card"> <p>13</p> </div>
-        <div @click="pickcard=true" class="card"> <p>21</p> </div>
-        <div @click="pickcard=true" class="card"> <p>34</p> </div>
-        <div @click="pickcard=true" class="card"> <p>55</p> </div>
-        <div @click="pickcard=true" class="card"> <p>89</p> </div>
-        <div @click="pickcard=true" class="card"> <p>?</p> </div>
+        <div @click="pickcard=true" class="card"> <p>0h</p> </div>
+        <div @click="pickcard=true" class="card"> <p>1h</p> </div>
+        <div @click="pickcard=true" class="card"> <p>2h</p> </div>
+        <div @click="pickcard=true" class="card"> <p>3h</p> </div>
+        <div @click="pickcard=true" class="card"> <p>5h</p> </div>
+        <div @click="pickcard=true" class="card"> <p>8h</p> </div>
+        <div @click="pickcard=true" class="card"> <p>13h</p> </div>
+        <div @click="pickcard=true" class="card"> <p>21h</p> </div>
       </div>
     </div>
   </div>
