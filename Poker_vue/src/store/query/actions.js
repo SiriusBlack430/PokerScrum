@@ -37,6 +37,7 @@ export async function repoConfig(user,token,project,room){
         throw Error(e)
     })
 }
+
 export async function getRepoConfig(){
     try{
         const data = await axios({
@@ -48,4 +49,27 @@ export async function getRepoConfig(){
         throw Error(e)
     }
     
+}
+
+
+export async function exportIssues(issues){
+    await axios({
+        url: "http://localhost:3001/export",
+        method:"POST",
+        data:{
+            issues:issues
+        },
+        responseType:'blob'
+    }).then((res)=>{
+        var fileUrl = window.URL.createObjectURL(new Blob([res.data]))
+        const parts = fileUrl.split("/")
+        var name = parts[parts.length-1]+".csv"
+        var fileLink = document.createElement('a')
+        fileLink.href = fileUrl
+        fileLink.setAttribute('download',name)
+        document.body.appendChild(fileLink)
+        fileLink.click()
+    }).catch((e)=>{
+        throw new Error(e)
+    })
 }

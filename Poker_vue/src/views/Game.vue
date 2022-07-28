@@ -1,5 +1,7 @@
 <script>
 import {queryAPI} from '../store/query/actions'
+import {exportIssues} from '../store/query/actions'
+
 
 export default{
   name: "Query",
@@ -10,11 +12,12 @@ export default{
       nameIssue: "",
       statusFilter:[],
       statusIssue:"",
+      actualIssue:"",
       user: localStorage.getItem('username'),
       room: localStorage.getItem('room'),
-      isOpen:false,
+      issueOpen:false,
+      issueExport:false,
       pickcard:false,
-      actualIssue:""
     }
   },
   async mounted() {
@@ -41,11 +44,16 @@ export default{
       }catch(e){
         console.log("ERROR REFRESH "+e)
       }
+    },
+    async exportIssue(){
+      try{
+        await exportIssues(this.issues)
+      }catch(e){
+        console.log(e);
+      }
     }
   }
-    
 }
-
 
 </script>
 
@@ -67,30 +75,33 @@ export default{
               <div class="button-mod">
                 <li> <a href="#">Invite Players</a></li>
               </div>
-              <div class="button-mod" @click="isOpen=true">
-                <li> <i class="fa fa-bars" aria-hidden="true"></i></li>
+              <div class="button-mod" @click="issueOpen=true">
+                <li> <i>&#8801;</i></li>
               </div>
             </ul>
           </div>
     </header>
     </div>
     <teleport to="body">
-      <div class="show-issues" v-if="isOpen">
+      <div class="show-issues" v-if="issueOpen">
           <div class="issueshead">
             <h1>{{project}}</h1>
-            <div  class="close-issues" @click="refresh">
-              <p class=reload>&#x21bb;</p>
+            <div class="symbols-issues" @click="refresh">
+              <p>&#11118;</p>
             </div>
-            <div @click="isOpen = false" class="close-issues">
-              <p>X</p>
-            </div>    
+            <div class="symbols-issues" @click="issueExport=true, issueOpen=false">
+              <p>&#129045;</p>
+            </div>
+            <div @click="issueOpen = false" class="symbols-issues">
+              <p>&#10006;</p>
+            </div>
             
           </div>
           <form @submit.prevent="query">
             <div class="data">
               <div id="select-input">
                 <select v-model="statusIssue">
-
+                  <option value="all">All</option>
                   <option v-for="status in statusFilter"  :selected="status" >{{status}}</option>
                 </select>
                 <input type="text" name="username" placeholder="Enter Status" v-model="nameIssue">
@@ -101,7 +112,7 @@ export default{
             </div>
           </form>
           <div class="issues">
-            <table >
+            <table>
                 <thead>
                     <tr>
                         <th scope="col">Name Issues</th>
@@ -111,13 +122,54 @@ export default{
                 </thead>
                 <tbody v-for="{title,status,label} in issues" :key="issues.id">
                     <tr>
-                        <td class="titulo" @click="this.actualIssue=title"><a>{{title}}</a></td> 
+                        <td class="titulo" @click="actualIssue=title"><a>{{title}}</a></td> 
                         <td>{{status}}</td>
                         <td>{{label}}</td>
                     </tr>
                 </tbody>
             </table>
           </div>
+      </div>
+      <div class="show-export" v-if="issueExport">
+        <div class="window-export">
+          <div class="head-export">
+            <h1>Issues from {{project}}</h1>
+            <div class="export-symbols">
+              <div class="symbols" @click="exportIssue">
+                <p>&#129047;</p>
+              </div>
+              <div class="symbols" @click="issueExport=false">
+                <p>&#10006;</p>
+              </div>
+            </div>
+          </div>
+          <div class="issues">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name Issues</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Labels</th>
+                        <th scope="col">Comments</th>
+                        <th scope="col">Assignees</th>
+                        <th scope="col">Participants</th>
+                    </tr>
+                </thead>
+                <tbody v-for="{id,title,status,label,comment,assign,participant,url} in issues" :key="issues.id">
+                    <tr>
+                        <td><a :href="url" target="_blank">{{id}}</a></td>
+                        <td class="titulo" @click="actualIssue=title"><a>{{title}}</a></td> 
+                        <td>{{status}}</td>
+                        <td>{{label}}</td>
+                        <td>{{comment}}</td>
+                        <td>{{assign}}</td>
+                        <td>{{participant}}</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </teleport>
     <div class="space"></div>
@@ -159,6 +211,62 @@ export default{
 
 <style>
 
+.show-export{
+  top: 0;
+  width:100%;
+  height: 100%;
+  position: absolute;
+  background: rgb(0,0,0,0.5);
+}
+
+.window-export{
+  width: 90%;
+  height: 85%;
+  margin-top: 3%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: white;
+  border-radius: 1.5rem;
+  overflow: auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.head-export{
+  width: 50%;
+  display: flex;
+  margin: auto;
+}
+
+.head-export > h1{
+  width: 90%;
+}
+
+.export-symbols{
+  display: flex;
+  justify-content: space-between;
+  width: 5rem;
+}
+
+.symbols{
+  width: 4rem;
+  margin: auto;
+  border: 1px solid hsla(204,6%,68%,.4);
+  border-radius: 1.5rem;
+  cursor: pointer;
+}
+
+.symbols:hover{
+  box-shadow: 0 2px 4px hsla(204,6%,68%,.4);
+  background-color: #f3f4f7;
+  transition: all .09s linear;
+  cursor: pointer;
+}
+
+.symbols > p{
+  margin: auto;
+  padding: 0.5rem;
+}
 
 .titulo a{
   cursor: pointer;
@@ -166,7 +274,6 @@ export default{
 .reload{
    font-family: Lucida Sans Unicode,
 }
-
 
 .button-mod > li > i {
   font-size: 170%;
@@ -205,9 +312,11 @@ export default{
   width: 80%;
   margin-left: auto;
   margin-right: auto;
+  word-wrap: break-word;
 }
 
-.issueshead > .close-issues{
+
+.symbols-issues{
   margin: auto;
   margin-right: 0;
   height: 50%;
@@ -216,14 +325,14 @@ export default{
   border-radius: 1.5rem;
 }
 
-.issueshead > .close-issues:hover{
+.symbols-issues:hover{
   box-shadow: 0 2px 4px hsla(204,6%,68%,.4);
   background-color: #f3f4f7;
   transition: all .09s linear;
   cursor: pointer;
 }
 
-.close-issues > p {
+.symbols-issues > p {
   text-align: center;
   margin: 0;
   padding: 0.5rem;
