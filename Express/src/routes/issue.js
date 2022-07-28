@@ -2,10 +2,10 @@ const express = require('express')
 const router = express.Router()
 const fetch = require('node-fetch')
 const pool = require("./conectionMysql")
-const uuid = require('uuid');
-var os = require('os');
-const fs = require('fs');
-var path = require('path');
+const uuid = require('uuid')
+const os = require('os')
+const fs = require('fs')
+const path = require('path')
 
 const baseUrl = "https://api.github.com/graphql"; // url api github
 let cart={},element=[]
