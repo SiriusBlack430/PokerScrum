@@ -27,14 +27,14 @@ export default {
       <header>
         <div class="left">
           <a href="/">
-            <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
+            <img src="../assets/logo_gps.jpg" alt="logo">
           </a>
         </div>
         <div class="right">
           <ul>
             <li v-if="showUserList"> <a href="userlist">USERLIST</a></li>
-            <li> <a href="/">LOGOUT</a></li>
-            <li> <a type="button"  href="creategame" >START NEW GAME</a></li>
+            <li> <a href="/">SALIR</a></li>
+            <li> <a type="button"  href="creategame" >NUEVO JUEGO</a></li>
 
           </ul>
         </div>
@@ -43,7 +43,7 @@ export default {
   <div class="space"></div>
   <main>
     <div class="maintenance">
-      <h1>Page in Maintenance</h1>
+      <h1>Página en Mantenimiento</h1>
       <div class="games">
         <img src="https://www.clipartkey.com/mpngs/m/184-1849588_maintenance-website-landing-page.png" alt="centro">
       </div>

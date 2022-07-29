@@ -7,13 +7,13 @@
       <header>
         <div class="left">
           <a href="/">
-            <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
+            <img src="../assets/logo_gps.jpg" alt="logo">
           </a>
         </div>
         <div class="right">
           <ul>
             <li> <a href="login">LOGIN</a></li>
-            <li> <a href="register">SIGN UP</a></li>
+            <li> <a href="register">RESGISTRAR</a></li>
           </ul>
         </div>
       </header>
@@ -21,8 +21,8 @@
   <main>
   <article>
     <div class="info">
-      <h1>Scrum Poker for agile development teams</h1>
-      <p>Have fun while being productive with our simple and complete tool.</p>
+      <h1>Scrum Poker para agilizar el desarrollo de equipo</h1>
+      <p>Diviértete siendo productivo con nuestra simple y completa herramienta</p>
       <div class="button-mod">
         <li> <a href="login">LOGIN</a></li>
       </div>

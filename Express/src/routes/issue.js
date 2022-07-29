@@ -79,6 +79,10 @@ function issues(user,projectNum){
   }
 }
 
+function userOrOrganization(parameter){
+
+}
+
 // filter all data that return github and return an js object of issues
 async function getIssue(){
   element=[],cart = {}
@@ -95,14 +99,14 @@ async function getIssue(){
     })
     const infoJson = await info.json();
     let fields = infoJson.data.user.projectV2.fields.nodes;
-    cart.project = infoJson.data.user.projectV2.title;
+      cart.project = infoJson.data.user.projectV2.title;
+      let items = infoJson.data.user.projectV2.items.nodes;
     let statusNames;
     for(let i=0;i<fields.length;i++){
       if(fields[i].name === "Status"){
         statusNames = fields[i].options
       }
     }
-    let items = infoJson.data.user.projectV2.items.nodes;
     for(let i=0; i<items.length; i++){
       for(let j=0; j<items[i].fieldValues.nodes.length; j++){
         for(let k=0; k<statusNames.length; k++){
@@ -134,8 +138,7 @@ async function getIssue(){
         element.push({project: cart.project,id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label,comment: cart.comment,assign: cart.assign,participant: cart.participant});
       }
     }
-    //return element
-    return infoJson
+    return element
   }catch(e){
     console.log(e)
   }
@@ -204,6 +207,11 @@ async function getRepConfig(){
   }
 }
 
+router.get("/prueba",async(req,res)=>{
+  var query = await getIssue();
+  res.send(query)
+
+})
 router.get("/getRepoConfig",async(req,res)=>{
   try{
     const data = await getRepConfig()
@@ -214,7 +222,6 @@ router.get("/getRepoConfig",async(req,res)=>{
   }
 })
 
-//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
 router.post("/configRepos",async (req,res)=>{
   var data = req.body;
   try{
@@ -231,7 +238,7 @@ router.post("/configRepos",async (req,res)=>{
     var fields = infoJson.data.user.projectV2.fields.nodes;
     if(fields.length>0){
       const repConfig = await pool.query("SELECT * FROM REPCONFIG")
-      if(repConfig.length==0){
+      if(repConfig.length==0 && data.token!==repConfig.token){
         await pool.query("INSERT INTO REPCONFIG(name,token,project) VALUES(?,?,?)",[data.user,data.token,data.project]);
       }
       res.sendStatus(200);
@@ -279,6 +286,7 @@ function mutation(){
     }`,
   }
 }
+
 //token  ghp_LUsFedtFM7gzvZnQ   Tr8t3lXUnuUg213LcKoa
 router.get("/",async(req,res)=>{
   try{

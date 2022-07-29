@@ -31,36 +31,36 @@ export default {
 
 <template>
 <div class="container">
-    <h2>REGISTER</h2>
+    <h2>REGISTRO</h2>
     <div class="pops" v-if="showError" @click="showError = false">
-        <p>Existing User!</p>
+        <p>¡Usuario Existente!</p>
     </div>
     <div class="pops" v-else-if="passwordMatch" @click="passwordMatch = false">
-        <p>Passwords do not match</p>
+        <p>Las contraseñas no coinciden</p>
     </div>
     <form @submit.prevent="register">
         <div class="data">
-            <label for="username">Username:</label>
+            <label for="username">Usuario:</label>
             <input 
             type="text" 
             name="username" 
-            placeholder="Enter Username"
+            placeholder="Escribe Usuario"
             v-model="username"
             >
         </div>
         <div class="data">
-            <label for="password">Password:</label>
-            <input type="password" name="password" placeholder="Enter Password"
+            <label for="password">Contraseña:</label>
+            <input type="password" name="password" placeholder="Escribe Contraseña"
             v-model="password"
             >
         </div>
         <div class="data">
-            <label for="password2">Confirm Password:</label>
-            <input type="password" name="password2" placeholder="Corfirm Password"
+            <label for="password2">Confirma Contraseña:</label>
+            <input type="password" name="password2" placeholder="Corfirma Contraseña"
             v-model="password2">
         </div>
         <div class="data">
-            <button type="submit">Enter</button>
+            <button type="submit">Enviar</button>
         </div>
         <div>
             <a href="login">Login</a>

@@ -31,7 +31,7 @@ export default {
   <header>
     <div class="left">
       <a href="/">
-        <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
+        <img src="../assets/logo_gps.jpg" alt="logo">
       </a>
       <h1>User List</h1>
     </div>
@@ -43,9 +43,9 @@ export default {
         <table>
             <thead>
                 <tr>
-                    <th scope="col">Username</th>
-                    <th scope="col">Privileges</th>
-                    <th scope="col"><p>Modify</p></th>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Privilegios</th>
+                    <th scope="col"><p>Modificar</p></th>
                 </tr>
             </thead>
             <tbody >
@@ -56,10 +56,10 @@ export default {
                       <div class="right">
                         <ul>
                           <div class="button-mod">
-                            <li>EDIT</li>
+                            <li>EDITAR</li>
                           </div>
                           <div class="button-mod">
-                            <li>DELETE</li>
+                            <li>BORRAR</li>
                           </div>
                           </ul>
                       </div>
