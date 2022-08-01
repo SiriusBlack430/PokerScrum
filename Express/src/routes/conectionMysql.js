@@ -28,7 +28,8 @@ CREATE TABLE REPCONFIG(
     id int(10) primary key auto_increment,
     name VARCHAR(50),
     token VARCHAR(200),
-    project int(2)
+    project int(2),
+    type VARCHAR(50)
 );
 
 */
