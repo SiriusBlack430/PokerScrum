@@ -10,12 +10,14 @@ export default {
       token:"",
       project:"",
       showError:false,
+      type:"",
     }
   },
   methods:{
     async connection(){
       try{
-        await repoConfig(this.user,this.token,this.project,this.room);
+        await repoConfig(this.user,this.token,this.project,this.room,this.type)
+        
       }catch(e){
         this.showError=true;
         console.log("Error"+e)
@@ -59,11 +61,13 @@ export default {
             >
         </div>
         <div class="data">
-            <label for="repository">User:</label>
+            <select v-model="type">
+              <option value="user">user</option>
+              <option value="organization">organization</option>
+            </select>
             <input 
             type="text" 
             name="repository" 
-            placeholder="Enter Repository Name"
             @click="showError = false"
             v-model="user"
             />

@@ -7,15 +7,15 @@ const os = require('os')
 const fs = require('fs')
 const path = require('path')
 
-const baseUrl = "https://api.github.com/graphql"; // url api github
+const baseUrl = "https://api.github.com/graphql" // url api github
 let cart={},element=[]
 
-// return query graphql api
-function issues(user,projectNum){
+// return query graphql api first 100 issues
+function queryIssues(login,projectNum,userOrOrganization){ 
   return{
     "query":`
     query{
-      user(login:"`+user+`"){
+      `+userOrOrganization+`(login:"`+login+`"){
         projectV2(number:`+projectNum+`){
           id
           title
@@ -33,40 +33,107 @@ function issues(user,projectNum){
               }
             }
           }
-          items(first:50){
-            nodes{
-              fieldValues(first: 20) {
-                nodes{
-                  ... on ProjectV2ItemFieldSingleSelectValue{
-                    id
-                    name
-                  }
-                }
-              }
-              content{
-                __typename
-                ... on Issue{
-                  number
-                  title
-                  labels(first:10){
-                    nodes{
+          items(first:100){
+            totalCount
+            edges{
+              cursor
+              node{
+                fieldValues(first: 20) {
+                  nodes{
+                    ... on ProjectV2ItemFieldSingleSelectValue{
+                      id
                       name
                     }
                   }
-                  bodyUrl
-                  comments(first:5){
-                    nodes{
-                      bodyText
+                }
+                content{
+                  __typename
+                  ... on Issue{
+                    number
+                    title
+                    labels(first:20){
+                      nodes{
+                        name
+                      }
+                    }
+                    bodyUrl
+                    bodyText
+                    assignees(first:5){
+                      nodes{
+                        login
+                      }
+                    }
+                    participants(first:5){
+                      nodes{
+                        login
+                      }
                     }
                   }
-                  assignees(first:5){
-                    nodes{
-                      login
+                }
+              }
+            }
+          }
+        }
+      }
+    }`,
+  }
+} 
+function queryIssueWithCursor(login,projectNum,userOrOrganization,cursor){
+  return{
+    "query":`
+    query{
+      `+userOrOrganization+`(login:"`+login+`"){
+        projectV2(number:`+projectNum+`){
+          id
+          title
+          fields(first:20){
+            nodes{
+              ... on ProjectV2SingleSelectField{
+                name
+                options{
+                  name
+                }
+              }
+              ... on ProjectV2Field{
+                id
+                name
+              }
+            }
+          }
+          items(first:100,after:"`+cursor+`"){
+            totalCount
+            edges{
+              cursor
+              node{
+                fieldValues(first: 20) {
+                  nodes{
+                    ... on ProjectV2ItemFieldSingleSelectValue{
+                      id
+                      name
                     }
                   }
-                  participants(first:5){
-                    nodes{
-                      login
+                }
+                content{
+                  __typename
+                  ... on Issue{
+                    number
+                    title
+                    labels(first:20){
+                      nodes{
+                        name
+                      }
+                    }
+                    bodyUrl
+                    bodyText
+                    assignees(first:5){
+                      nodes{
+                        login
+                      }
+                    }
+                    participants(first:5){
+                      nodes{
+                        login
+                      }
                     }
                   }
                 }
@@ -78,69 +145,109 @@ function issues(user,projectNum){
     }`,
   }
 }
+function queryConnection(login,projectNum,userOrOrganization){
+  return{
+    "query":`
+    query{
+      `+userOrOrganization+`(login:"`+login+`"){
+        projectV2(number:`+projectNum+`){
+          id
+        }
+      }
+    }`
+  }
+}
 
 // filter all data that return github and return an js object of issues
-async function getIssue(){
-  element=[],cart = {}
+
+//get first 100 issues
+async function getIssue(data,cursor){
   try{
-    const data = await getRepConfig()
+    
     const headers = {
       "Content-Type":"application/json",
       Authorization: `bearer ${data.token}`
     }
-    const info = await fetch(baseUrl,{
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(issues(data.name,data.project))
-    })
-    const infoJson = await info.json();
-    let fields = infoJson.data.user.projectV2.fields.nodes;
-    cart.project = infoJson.data.user.projectV2.title;
-    let statusNames;
-    for(let i=0;i<fields.length;i++){
-      if(fields[i].name === "Status"){
-        statusNames = fields[i].options
-      }
+    let info
+    if(cursor === null){
+      info = await fetch(baseUrl,{
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(queryIssues(data.name,data.project,data.type))
+      })
+    }else{
+      info = await fetch(baseUrl,{
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(queryIssueWithCursor(data.name,data.project,data.type,cursor))
+      })
     }
-    let items = infoJson.data.user.projectV2.items.nodes;
-    for(let i=0; i<items.length; i++){
-      for(let j=0; j<items[i].fieldValues.nodes.length; j++){
-        for(let k=0; k<statusNames.length; k++){
-          if(statusNames[k].name === items[i].fieldValues.nodes[j].name){
-            cart.status = items[i].fieldValues.nodes[j].name
-          }
-        }
-      }
-      cart.label=""
-      cart.comment=""
-      cart.assign=""
-      cart.participant=""
-      if(items[i].content.__typename==="Issue"){
-        cart.id = items[i].content.number
-        cart.title = items[i].content.title
-        cart.url = items[i].content.bodyUrl
-        for(var l=0; l<items[i].content.labels.nodes.length; l++){
-          cart.label = items[i].content.labels.nodes[l].name+", "+cart.label
-        }
-        for(var l=0; l<items[i].content.comments.nodes.length; l++){
-          cart.comment = "'"+items[i].content.comments.nodes[l].bodyText+"', "+cart.comment
-        }
-        for(var l=0; l<items[i].content.assignees.nodes.length; l++){
-          cart.assign = items[i].content.assignees.nodes[l].login+", "+cart.assign
-        }
-        for(var l=0; l<items[i].content.participants.nodes.length; l++){
-          cart.participant = items[i].content.participants.nodes[l].login+", "+cart.participant
-        }
-        element.push({project: cart.project,id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label,comment: cart.comment,assign: cart.assign,participant: cart.participant});
-      }
-    }
-    //return element
+     
+    const infoJson = await info.json()
     return infoJson
   }catch(e){
     console.log(e)
   }
 }
 
+function filterInfoJson(infoJson,type){
+  try{
+    
+    let items,statusNames, fields
+    if(type==="organization"){
+      fields = infoJson.data.organization.projectV2.fields.nodes
+      cart.project = infoJson.data.organization.projectV2.title
+      items = infoJson.data.organization.projectV2.items.edges
+      
+    }else if(type==="user"){
+      fields = infoJson.data.user.projectV2.fields.nodes
+      cart.project = infoJson.data.user.projectV2.title
+      items = infoJson.data.user.projectV2.items.edges
+    }
+  
+    for(let i=0;i<fields.length;i++){
+      if(fields[i].name === "Status"){
+        statusNames = fields[i].options
+      }
+    }
+    
+    for(let i=0; i<items.length; i++){
+      for(let j=0; j<items[i].node.fieldValues.nodes.length; j++){
+        for(let k=0; k<statusNames.length; k++){
+          if(statusNames[k].name === items[i].node.fieldValues.nodes[j].name){
+            cart.status = items[i].node.fieldValues.nodes[j].name
+          }
+        }
+      }
+      cart.label=""
+      cart.description=""
+      cart.assign=""
+      cart.participant=""
+      if(items[i].node.content.__typename==="Issue"){
+        cart.id = items[i].node.content.number
+        cart.title = items[i].node.content.title
+        cart.url = items[i].node.content.bodyUrl
+        for(var l=0; l<items[i].node.content.labels.nodes.length; l++){
+          cart.label = items[i].node.content.labels.nodes[l].name+", "+cart.label
+        }
+        /* for(var l=0; l<items[i].node.content.comments.nodes.length; l++){
+          cart.comment = "'"+items[i].node.content.comments.nodes[l].bodyText+"', "+cart.comment
+        } */
+        cart.description = items[i].node.content.bodyText
+        for(var l=0; l<items[i].node.content.assignees.nodes.length; l++){
+          cart.assign = items[i].node.content.assignees.nodes[l].login+", "+cart.assign
+        }
+        for(var l=0; l<items[i].node.content.participants.nodes.length; l++){
+          cart.participant = items[i].node.content.participants.nodes[l].login+", "+cart.participant
+        }
+        element.push({project: cart.project,id: cart.id,title: cart.title,status: cart.status,url: cart.url,label: cart.label,description: cart.description,assign: cart.assign,participant: cart.participant});
+      }
+    }
+  }catch(e){
+    console.log(e)
+  }
+  
+}
 // filter issues by string
 function filterIssues(data,status,name){
   let elementFilter=[]
@@ -214,9 +321,8 @@ router.get("/getRepoConfig",async(req,res)=>{
   }
 })
 
-//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
 router.post("/configRepos",async (req,res)=>{
-  var data = req.body;
+  const data = req.body;
   try{
     headers = {
       "Content-Type":"application/json",
@@ -225,16 +331,31 @@ router.post("/configRepos",async (req,res)=>{
     const info = await fetch(baseUrl,{
       method: "POST",
       headers: headers,
-      body: JSON.stringify(issues(data.user,data.project))
+      body: JSON.stringify(queryConnection(data.user,data.project,data.type))
     })
     const infoJson = await info.json();
-    var fields = infoJson.data.user.projectV2.fields.nodes;
-    if(fields.length>0){
-      const repConfig = await pool.query("SELECT * FROM REPCONFIG")
-      if(repConfig.length==0){
-        await pool.query("INSERT INTO REPCONFIG(name,token,project) VALUES(?,?,?)",[data.user,data.token,data.project]);
+
+    let fields
+    if(data.type ==="user"){
+      fields = infoJson.data.user.projectV2.id;
+    }else if(data.type ==="organization"){
+      fields = infoJson.data.organization.projectV2.id;
+    }
+    
+    if(fields.length!==null){
+      try{
+        const repConfig = await pool.query("SELECT * FROM REPCONFIG")
+        if(repConfig.length==0){
+          await pool.query("INSERT INTO REPCONFIG(name,token,project,type) VALUES(?,?,?,?)",[data.user,data.token,data.project,data.type])
+        }else{
+          await pool.query("UPDATE REPCONFIG SET name = ?, token=?, project=?, type=?  WHERE  id=1",[data.user,data.token,data.project,data.type])
+        }
+        res.sendStatus(200);
+      }catch(e){
+        console.log(e)
+        res.sendStatus(500)
       }
-      res.sendStatus(200);
+      
     }
   }catch(e){
     console.log(e);
@@ -242,21 +363,50 @@ router.post("/configRepos",async (req,res)=>{
   }
 })
 
-router.get("/game",async(req,res)=>{
-})
 
 router.get("/mutation",async(req,res)=>{
   res.send(await getIssue())  
 })
 
 router.post("/searchIssue",async(req,res)=>{
-  var status = req.body.status;
-  var name = req.body.name;
-  let refresh = req.body.refresh
+  const status = req.body.status;
+  const name = req.body.name;
+  const refresh = req.body.refresh
+  const type = req.body.type
+  
   if(element.length===0 || refresh){
-    await getIssue()
+    if(refresh){
+      element=[],cart = {}
+    } 
+    const data = await getRepConfig()
+    const infoJson = await getIssue(data,null)
+    filterInfoJson(infoJson,type)
+    if(data.type ==="organization"){
+      if(infoJson.data.organization.projectV2.items.totalCount > 100){
+        const petitions = Math.trunc(infoJson.data.organization.projectV2.items.totalCount/100)
+        let cursor = infoJson.data.organization.projectV2.items.edges[infoJson.data.organization.projectV2.items.edges.length-1].cursor
+        for(let i =0;i<petitions;i++){
+          let info = await getIssue(data,cursor)
+          filterInfoJson(info,type)
+          cursor = info.data.organization.projectV2.items.edges[info.data.organization.projectV2.items.edges.length-1].cursor
+        }
+      }
+    }else if(data.type ==="user"){
+      if(infoJson.data.user.projectV2.items.totalCount > 100){
+        const petitions = Math.trunc(infoJson.data.user.projectV2.items.totalCount/100)
+        let cursor = infoJson.data.user.projectV2.items.edges[infoJson.data.user.projectV2.items.edges.length-1].cursor
+        for(let i =0;i<petitions;i++){
+          let info = await getIssue(data,cursor)
+          filterInfoJson(info,type)
+          cursor = info.data.organization.projectV2.items.edges[info.data.user.projectV2.items.edges.length-1].cursor
+        }
+      }
+    }
+    
+
   }
   const filteredData = filterIssues(element,status,name)
+
   res.send(filteredData)
 })
 
@@ -284,14 +434,14 @@ router.get("/",async(req,res)=>{
   try{
     const headers = {
       "Content-Type":"application/json",
-      Authorization: `bearer ` // token
+      Authorization: `bearer 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` // token
     }
     const info = await fetch(baseUrl,{
       method: "POST",
       headers: headers,
-      body: JSON.stringify(mutation())
+      body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
     })
-    const infoJson = await info.json();
+    const infoJson = await info.json()
     console.log(infoJson)
     res.send(infoJson)
   }catch(e){

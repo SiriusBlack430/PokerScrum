@@ -57,8 +57,8 @@ router.post('/register', async (req, res)=>{
             res.sendStatus(404)
         }else{
             const hashedPassword = await bcrypt.hash(data.password,saltRounds)
-            const num = await pool.query("SELECT MAX(id) as id FROM USER")
-            await pool.query("ALTER TABLE USER AUTO_INCREMENT = ?",num[0].id)
+            //const num = await pool.query("SELECT MAX(id) as id FROM USER")
+            //await pool.query("ALTER TABLE USER AUTO_INCREMENT = ?",num[0].id)
             await pool.query("INSERT INTO USER(username,password,permiss) VALUES(?,?,?)",[data.username,hashedPassword,"USER"],function(e,result){
                 if(e){
                     res.sendStatus(404)
@@ -70,6 +70,7 @@ router.post('/register', async (req, res)=>{
         res.sendStatus(404)
     }  
 })
+
 
 router.get('/userList',authenticateToken,async (req, res)=>{
     const User = await pool.query("SELECT id,username,permiss FROM USER");

@@ -2,7 +2,7 @@ import axios from "axios";
 import router from "../../router";
 
 
-export async function queryAPI(status,name,refresh){
+export async function queryAPI(status,name,refresh,type){
 
     try{
         const data = await axios({
@@ -11,7 +11,8 @@ export async function queryAPI(status,name,refresh){
             data:{
                 status: status,
                 name: name,
-                refresh
+                refresh,
+                type
             }
         })
         return data.data
@@ -21,17 +22,19 @@ export async function queryAPI(status,name,refresh){
     
 }
 
-export async function repoConfig(user,token,project,room){
+export async function repoConfig(user,token,project,room,type){
     await axios({
         url: "http://localhost:3001/configRepos",
             method: "POST",
             data:{
                 user:user,
                 token:token,
-                project:project
+                project:project,
+                type
             }
     }).then(()=> {
         localStorage.setItem('room',room)
+        localStorage.setItem("type",type)
         router.push({ name: "game" })
     }).catch((e)=> {
         throw Error(e)
