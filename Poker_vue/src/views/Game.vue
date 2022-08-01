@@ -19,11 +19,12 @@ export default{
       issueOpen:false,
       issueExport:false,
       pickcard:false,
+      type: localStorage.getItem('type')
     }
   },
   async mounted() {
     try{
-      this.issues = await queryAPI(this.statusIssue,this.nameIssue,false)
+      this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.type)
       this.project = this.issues[0].project
       this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){
@@ -34,14 +35,14 @@ export default{
   methods:{
     async query(){
       try{
-       this.issues = await queryAPI(this.statusIssue,this.nameIssue,false)
+       this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.type)
       }catch(e){
         console.log("Error " + e)
       }
     },
     async refresh(){
       try{
-        this.issues = await queryAPI("","",true)
+        this.issues = await queryAPI("","",true,this.type)
       }catch(e){
         console.log("ERROR REFRESH "+e)
       }
@@ -152,18 +153,18 @@ export default{
                         <th scope="col">Name Issues</th>
                         <th scope="col">Status</th>
                         <th scope="col">Labels</th>
-                        <th scope="col">Comments</th>
+                        <th scope="col">Description</th>
                         <th scope="col">Assignees</th>
                         <th scope="col">Participants</th>
                     </tr>
                 </thead>
-                <tbody v-for="{id,title,status,label,comment,assign,participant,url} in issues" :key="issues.id">
+                <tbody v-for="{id,title,status,label,description,assign,participant,url} in issues" :key="issues.id">
                     <tr>
                         <td><a :href="url" target="_blank">{{id}}</a></td>
                         <td class="titulo" @click="actualIssue=title"><a>{{title}}</a></td> 
                         <td>{{status}}</td>
                         <td>{{label}}</td>
-                        <td>{{comment}}</td>
+                        <td style="font-size:small">{{description}}</td>
                         <td>{{assign}}</td>
                         <td>{{participant}}</td>
                     </tr>
