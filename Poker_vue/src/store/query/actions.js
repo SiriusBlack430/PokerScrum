@@ -23,6 +23,7 @@ export async function queryAPI(status,name,refresh,type){
 }
 
 export async function repoConfig(user,token,project,room,type){
+    const id = localStorage.getItem('id')
     await axios({
         url: "http://localhost:3001/configRepos",
             method: "POST",
@@ -30,7 +31,8 @@ export async function repoConfig(user,token,project,room,type){
                 user:user,
                 token:token,
                 project:project,
-                type
+                type,
+                id
             }
     }).then(()=> {
         localStorage.setItem('room',room)

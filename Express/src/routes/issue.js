@@ -356,15 +356,10 @@ router.post("/configRepos",async (req,res)=>{
       fields = infoJson.data.organization.projectV2.id;
     }
     
-    if(fields.length!==null){
+    if(fields!==null){
       try{
-        const repConfig = await pool.query("SELECT * FROM REPCONFIG")
-        if(repConfig.length==0){
-          await pool.query("INSERT INTO REPCONFIG(name,token,project,type) VALUES(?,?,?,?)",[data.user,data.token,data.project,data.type])
-        }else{
-          await pool.query("UPDATE REPCONFIG SET name = ?, token=?, project=?, type=?  WHERE  id=1",[data.user,data.token,data.project,data.type])
-        }
-        res.sendStatus(200);
+          await pool.query("INSERT INTO REPCONFIG(name,token,project,type,created_user_id) VALUES(?,?,?,?,?)",[data.user,data.token,data.project,data.type,data.id])
+          res.sendStatus(200);
       }catch(e){
         console.log(e)
         res.sendStatus(500)

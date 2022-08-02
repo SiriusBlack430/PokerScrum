@@ -1,0 +1,1 @@
+ALTER TABLE REPCONFIG ADD COLUMN created_user_id int(10) not null

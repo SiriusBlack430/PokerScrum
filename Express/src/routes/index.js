@@ -40,7 +40,8 @@ router.post('/log',async (req,res)=>{
         if(compare){          
             const token = generateAccessToken(data.username)
             const permiss = User[0].permiss
-            res.send({token, permiss})
+            const id = User[0].id
+            res.send({token, permiss,id})
         }else{
             res.sendStatus(404)
         }  

@@ -13,6 +13,7 @@ export async function LoginAPI(username, password){
         localStorage.setItem('username',username);
         localStorage.setItem('token',response.data.token);
         localStorage.setItem('permiss',response.data.permiss);
+        localStorage.setItem('id',response.data.id)
         router.push({
             name: "logged"
         })
