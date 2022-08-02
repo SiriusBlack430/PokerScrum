@@ -15,6 +15,7 @@ function queryIssues(login,projectNum,userOrOrganization){
   return{
     "query":`
     query{
+     
       `+userOrOrganization+`(login:"`+login+`"){
         projectV2(number:`+projectNum+`){
           id
@@ -78,6 +79,18 @@ function queryIssues(login,projectNum,userOrOrganization){
     }`,
   }
 } 
+function query(){
+  return {"query":`query{
+    organization(login: "gps-plan") {
+      projectV2(number: 7) {
+        field(name: "Status")
+        items(first: 100){
+          totalCount
+        }
+      }
+    }
+  }`}
+}
 function queryIssueWithCursor(login,projectNum,userOrOrganization,cursor){
   return{
     "query":`
@@ -191,6 +204,7 @@ async function getIssue(data,cursor){
 }
 
 function filterInfoJson(infoJson,type){
+
   try{
     
     let items,statusNames, fields
@@ -212,6 +226,7 @@ function filterInfoJson(infoJson,type){
     }
     
     for(let i=0; i<items.length; i++){
+
       for(let j=0; j<items[i].node.fieldValues.nodes.length; j++){
         for(let k=0; k<statusNames.length; k++){
           if(statusNames[k].name === items[i].node.fieldValues.nodes[j].name){
@@ -334,7 +349,7 @@ router.post("/configRepos",async (req,res)=>{
       body: JSON.stringify(queryConnection(data.user,data.project,data.type))
     })
     const infoJson = await info.json();
-
+    console.log(infoJson)
     let fields
     if(data.type ==="user"){
       fields = infoJson.data.user.projectV2.id;
@@ -434,12 +449,13 @@ router.get("/",async(req,res)=>{
   try{
     const headers = {
       "Content-Type":"application/json",
-      Authorization: `bearer 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` // token
+      Authorization: `bearer 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` // token
     }
     const info = await fetch(baseUrl,{
       method: "POST",
       headers: headers,
       body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
+      //body: JSON.stringify(query())
     })
     const infoJson = await info.json()
     console.log(infoJson)

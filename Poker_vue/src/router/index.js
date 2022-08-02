@@ -62,6 +62,7 @@ router.beforeEach(async (to, from, next) => {
     localStorage.removeItem('username')
     localStorage.removeItem('permiss')
     localStorage.removeItem('room')
+    localStorage.removeItem('type')
   }
   if(to.meta.auth === false){
     next()
