@@ -349,7 +349,6 @@ router.post("/configRepos",async (req,res)=>{
       body: JSON.stringify(queryConnection(data.user,data.project,data.type))
     })
     const infoJson = await info.json();
-    console.log(infoJson)
     let fields
     if(data.type ==="user"){
       fields = infoJson.data.user.projectV2.id;

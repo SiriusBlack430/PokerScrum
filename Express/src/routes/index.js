@@ -33,7 +33,6 @@ function authenticateToken(req,res,next){
 router.post('/log',async (req,res)=>{
     const data = req.body
     const User = await pool.query("SELECT * FROM USER WHERE username= ?",data.username)
-    console.log(User);
     if(User.length==0){
         res.sendStatus(404)
     }else{
