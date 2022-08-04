@@ -16,7 +16,7 @@ use prueba;
 
 DROP TABLE IF EXISTS USER;
 CREATE TABLE USER(
-    id int(10) primary key auto_increment,
+    id bigint unsigned primary key auto_increment,
     username VARCHAR(50),
     password VARCHAR(200),
     permiss VARCHAR(20)
@@ -25,12 +25,28 @@ INSERT INTO USER(username,password,permiss) VALUES("amy","$2b$10$B3aozsB.Dw1gFit
 
 DROP TABLE IF EXISTS REPCONFIG;
 CREATE TABLE REPCONFIG(
-    id int(10) primary key auto_increment,
-    name VARCHAR(50),
-    token VARCHAR(200),
-    project int(2),
-    type VARCHAR(50)
+    id bigint unsigned primary key auto_increment,
+    login VARCHAR(50) not null,
+    token VARCHAR(200) not null,
+    project int(2) not null,
+    type VARCHAR(50) not null,
+    programed_date DATETIME,
+    created_user_id bigint unsigned not null,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name varchar(50) not null,
+    foreign key(created_user_id) references user(id)
 );
+
+INSERT INTO REPCONFIG(login,token,project,type,created_user_id,name) VALUES("gps-plan","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",7,"organization",2,"mock room")
+
+DROP TABLE IF EXISTS USER_SALA;
+CREATE TABLE USER_SALA(
+    user_id bigint unsigned,
+    repconfig_id bigint unsigned,
+    primary key(user_id,repconfig_id),
+    foreign key (user_id) references user(id),
+    foreign key (repconfig_id) references repconfig(id)
+)
 
 */
 

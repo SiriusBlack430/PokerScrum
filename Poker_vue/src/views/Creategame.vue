@@ -11,12 +11,14 @@ export default {
       project:"",
       showError:false,
       type:"",
+      startDate:""
     }
   },
   methods:{
     async connection(){
       try{
-        await repoConfig(this.user,this.token,this.project,this.room,this.type)
+        
+        await repoConfig(this.user,this.token,this.project,this.room,this.type,this.startDate)
         
       }catch(e){
         this.showError=true;
@@ -61,7 +63,7 @@ export default {
             >
         </div>
         <div class="data">
-            <select v-model="type">
+            <select style="padding:3px;" v-model="type">
               <option value="user">user</option>
               <option value="organization">organization</option>
             </select>
@@ -92,6 +94,15 @@ export default {
             v-model="project"
             />
         </div>
+        <div class="data">
+          <label for="start">Start date:</label>
+          <input type="datetime-local" 
+          id="startDate" 
+          name="trip-start"
+          v-model="startDate"
+          >
+        </div>
+        
         <div class="data">
             <button type="submit">Create Game</button>
         </div>

@@ -1,7 +1,6 @@
 import axios from "axios";
 import router from "../../router";
 
-
 export async function queryAPI(status,name,refresh,type){
 
     try{
@@ -22,22 +21,24 @@ export async function queryAPI(status,name,refresh,type){
     
 }
 
-export async function repoConfig(user,token,project,room,type){
+export async function repoConfig(user,token,project,room,type,startDate){
     const id = localStorage.getItem('id')
     await axios({
         url: "http://localhost:3001/configRepos",
             method: "POST",
             data:{
+                room,
                 user:user,
                 token:token,
                 project:project,
                 type,
-                id
+                id,
+                startDate
             }
-    }).then(()=> {
+    }).then((res)=> {
         localStorage.setItem('room',room)
         localStorage.setItem("type",type)
-        router.push({ name: "game" })
+        router.push({ name: "game", params: { id: res.data.id } })
     }).catch((e)=> {
         throw Error(e)
     })
@@ -72,8 +73,8 @@ export async function exportIssues(issues){
         var fileLink = document.createElement('a')
         fileLink.href = fileUrl
         fileLink.setAttribute('download',name)
-        document.body.appendChild(fileLink)
-        fileLink.click()
+        document.body.appendChild(fileLink)     
+        fileLink.click()  
     }).catch((e)=>{
         throw new Error(e)
     })

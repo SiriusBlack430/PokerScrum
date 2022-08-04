@@ -39,3 +39,22 @@ export async function RegisterAPI(username,password){
         throw new Error(e)
     })
 }
+export async function LoggedAPI(id){
+    try{
+        const data = await axios({
+            url: "http://localhost:3001/logged",
+            method:"POST",
+            data:{
+                id
+            }
+        })
+        return data.data
+    }catch(e){
+        console.log(e);
+        throw Error(e)
+    }
+   
+        
+   
+   
+}

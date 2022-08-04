@@ -33,7 +33,7 @@ const router = createRouter({
       component: () => import('../views/Creategame.vue')
     },
     {
-      path: '/game',
+      path: '/game/:id',
       name: 'game',
       component: () => import('../views/Game.vue')
     },
@@ -49,7 +49,7 @@ const router = createRouter({
       component: () => import('../views/Logged.vue')
     },
     {
-      path: '/config',
+      path: '/game/:id/config',
       name: 'config',
       component: () => import('../views/Config.vue')
     },

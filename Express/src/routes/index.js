@@ -70,7 +70,24 @@ router.post('/register', async (req, res)=>{
         res.sendStatus(404)
     }  
 })
+//
+router.post('/logged',async(req,res)=>{
 
+    const id = req.body.id
+    try{
+        const data = await pool.query("SELECT repconfig_id from user_sala where user_id=?",id)
+        const parseData = Object.values(JSON.parse(JSON.stringify(data)))
+        let salaInfo =[]
+        for(let i in parseData){ 
+            const Info = await pool.query("SELECT name,programed_date,created_user_id from repconfig where id= ?",parseData[i]['repconfig_id'])
+            salaInfo.push({ name:Info[0].name, programed_date:Info[0].programed_date,created_user_id:Info[0].created_user_id})
+        }
+        res.send(salaInfo)
+    }catch(e){
+        console.log(e)
+        res.sendStatus(500)
+    }
+})
 
 router.get('/userList',authenticateToken,async (req, res)=>{
     const User = await pool.query("SELECT id,username,permiss FROM USER");

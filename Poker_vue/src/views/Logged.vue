@@ -1,19 +1,23 @@
 <script>
-import axios from 'axios';
+import { LoggedAPI } from '../store/login/actions'
 export default {
   name: "get-rules",
   data() {
     return {  
-      // User:{},
-      showUserList: false
+      admin: false,
+      sessions:[]
     }
   },
   async mounted(){
     try{
       const token = localStorage.getItem('token')
       const permiss = localStorage.getItem('permiss')
+      const id = localStorage.getItem('id')
       if(token==null) return;
-      if(permiss=='ADMIN') this.showUserList = true;
+      if(permiss=='ADMIN'){
+        this.admin = true;
+      } 
+     this.sessions  = await LoggedAPI(id)
     }catch(e){
       console.log(e)
     }
@@ -32,26 +36,37 @@ export default {
         </div>
         <div class="right">
           <ul>
-            <li v-if="showUserList"> <a href="userlist">USERLIST</a></li>
+            <li v-if="admin"> <a href="userlist">USERLIST</a></li>
+            <li v-if="admin"> <a type="button"  href="creategame" >START NEW GAME</a></li>
             <li> <a href="/">LOGOUT</a></li>
-            <li> <a type="button"  href="creategame" >START NEW GAME</a></li>
 
           </ul>
         </div>
       </header>
   </div>
   <div class="space"></div>
-  <main>
-    <div class="maintenance">
+  <main class="flex">
+   <!--  <div class="maintenance">
       <h1>Page in Maintenance</h1>
       <div class="games">
         <img src="https://www.clipartkey.com/mpngs/m/184-1849588_maintenance-website-landing-page.png" alt="centro">
       </div>
+    </div> -->
+    <div v-for="{name,programed_date} in sessions">
+        <div style="border: 1px solid; text-align:center">
+          <h1>{{name}}</h1>
+          <p>{{programed_date}}</p>
+        </div> 
     </div>
   </main>
 </template>
 
 <style>
+.flex{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+}
 main{
   width:100%
 }

@@ -15,7 +15,6 @@ function queryIssues(login,projectNum,userOrOrganization){
   return{
     "query":`
     query{
-     
       `+userOrOrganization+`(login:"`+login+`"){
         projectV2(number:`+projectNum+`){
           id
@@ -80,12 +79,40 @@ function queryIssues(login,projectNum,userOrOrganization){
   }
 } 
 function query(){
-  return {"query":`query{
-    organization(login: "gps-plan") {
-      projectV2(number: 7) {
-        field(name: "Status")
-        items(first: 100){
+  return {"query":`
+  query{
+    organization(login:"gps-plan"){
+      projectV2(number:7){
+        id
+        title
+        fields(first:20){
+          nodes{
+            ... on ProjectV2SingleSelectField{
+              name
+              options{
+                name
+              }
+            }
+            ... on ProjectV2Field{
+              id
+              name
+            }
+          }
+        }
+        items(first:100){
           totalCount
+          edges{
+            cursor
+            node{
+              content{
+                __typename
+                ... on Issue{
+                  number
+                  title
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -176,7 +203,6 @@ function queryConnection(login,projectNum,userOrOrganization){
 //get first 100 issues
 async function getIssue(data,cursor){
   try{
-    
     const headers = {
       "Content-Type":"application/json",
       Authorization: `bearer ${data.token}`
@@ -186,13 +212,13 @@ async function getIssue(data,cursor){
       info = await fetch(baseUrl,{
         method: "POST",
         headers: headers,
-        body: JSON.stringify(queryIssues(data.name,data.project,data.type))
+        body: JSON.stringify(queryIssues(data.login,data.project,data.type))
       })
     }else{
       info = await fetch(baseUrl,{
         method: "POST",
         headers: headers,
-        body: JSON.stringify(queryIssueWithCursor(data.name,data.project,data.type,cursor))
+        body: JSON.stringify(queryIssueWithCursor(data.login,data.project,data.type,cursor))
       })
     }
      
@@ -204,9 +230,7 @@ async function getIssue(data,cursor){
 }
 
 function filterInfoJson(infoJson,type){
-
   try{
-    
     let items,statusNames, fields
     if(type==="organization"){
       fields = infoJson.data.organization.projectV2.fields.nodes
@@ -245,9 +269,6 @@ function filterInfoJson(infoJson,type){
         for(var l=0; l<items[i].node.content.labels.nodes.length; l++){
           cart.label = items[i].node.content.labels.nodes[l].name+", "+cart.label
         }
-        /* for(var l=0; l<items[i].node.content.comments.nodes.length; l++){
-          cart.comment = "'"+items[i].node.content.comments.nodes[l].bodyText+"', "+cart.comment
-        } */
         cart.description = items[i].node.content.bodyText
         for(var l=0; l<items[i].node.content.assignees.nodes.length; l++){
           cart.assign = items[i].node.content.assignees.nodes[l].login+", "+cart.assign
@@ -358,8 +379,11 @@ router.post("/configRepos",async (req,res)=>{
     
     if(fields!==null){
       try{
-          await pool.query("INSERT INTO REPCONFIG(name,token,project,type,created_user_id) VALUES(?,?,?,?,?)",[data.user,data.token,data.project,data.type,data.id])
-          res.sendStatus(200);
+          await pool.query("INSERT INTO REPCONFIG(login,token,project,type,created_user_id,programed_date,name) VALUES(?,?,?,?,?,?,?)",[data.user,data.token,data.project,data.type,data.id,data.startDate,data.room])
+          const id = await pool.query("SELECT LAST_INSERT_ID();")
+          const idformat = Object.values(JSON.parse(JSON.stringify(id)))
+          await pool.query("INSERT INTO USER_SALA VALUES(?,?)",[data.id,idformat[0]['LAST_INSERT_ID()']])
+          res.send({id : idformat[0]['LAST_INSERT_ID()']});
       }catch(e){
         console.log(e)
         res.sendStatus(500)
@@ -371,7 +395,6 @@ router.post("/configRepos",async (req,res)=>{
     res.sendStatus(404);
   }
 })
-
 
 router.get("/mutation",async(req,res)=>{
   res.send(await getIssue())  
@@ -443,13 +466,13 @@ router.get("/",async(req,res)=>{
   try{
     const headers = {
       "Content-Type":"application/json",
-      Authorization: `bearer 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` // token
+      Authorization: `bearer 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` // token
     }
     const info = await fetch(baseUrl,{
       method: "POST",
       headers: headers,
       body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
-      //body: JSON.stringify(query())
+      //body: JSON.stringify(queryIssues())
     })
     const infoJson = await info.json()
     console.log(infoJson)

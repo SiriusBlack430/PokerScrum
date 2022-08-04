@@ -1,6 +1,7 @@
 <script>
 import {queryAPI} from '../store/query/actions'
 import {exportIssues} from '../store/query/actions'
+import router from '../router'
 
 
 export default{
@@ -19,17 +20,18 @@ export default{
       issueOpen:false,
       issueExport:false,
       pickcard:false,
+      id: 0,
       type: localStorage.getItem('type')
     }
   },
   async mounted() {
     try{
+      this.id = this.$route.params.id
       this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.type)
       this.project = this.issues[0].project
       this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){
         console.log("Error " + e)
-  
     }
   },
   methods:{
@@ -53,6 +55,9 @@ export default{
       }catch(e){
         console.log(e);
       }
+    },
+    config(){
+      router.push({name:'config'})
     }
   }
 }
@@ -67,12 +72,15 @@ export default{
         <a href="/">
           <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
         </a>
-        <h1>{{room}}</h1>
+        <h1>{{room}} - {{$route.params.id}}</h1>
       </div>
       <div class="right">
-            <ul>              
+            <ul>   
               <div class="button-mod">
-                <li> <a href="config">CONFIG</a></li>
+                <li> <a href="/logged">Inicio</a></li>
+              </div>           
+              <div class="button-mod" @click="config">
+                <li> <a >CONFIG</a></li>
               </div>   
               <div class="button-mod">
                 <li> <a href="#">Invite Players</a></li>
