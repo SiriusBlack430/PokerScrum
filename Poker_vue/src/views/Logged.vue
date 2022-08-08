@@ -65,7 +65,7 @@ export default {
     <div v-for="{name,programed_date,id} in sessions">
         <div style="border: 1px solid; text-align:center;cursor: pointer;" @click="goTo(id)" >
           <h1>{{name}}</h1>
-          <p>{{programed_date}}</p>
+          <p>{{ programed_date}}</p>
         </div> 
     </div>
   </main>

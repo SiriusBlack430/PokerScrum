@@ -336,13 +336,17 @@ async function getRepConfig(id){
  
 }
 
-router.get("/getRepoConfig",async(req,res)=>{
+router.post("/getRepoConfig",async(req,res)=>{
   try{
-    const data = await getRepConfig()
-    res.send(data)
+    const repConfig = await pool.query("SELECT login,project,type,convert_tz(programed_date,'+00:00','+02:00') as programed_date,name FROM REPCONFIG WHERE id=?",req.body.id)
+    if(repConfig.length!==1){
+      res.sendStatus(404)
+    } else {
+      res.send(repConfig[0]) 
+    }
   }catch(e){
     console.log(e)
-    res.sendStatus(404)
+    res.sendStatus(500)
   }
 })
 
@@ -388,10 +392,8 @@ router.post("/configRepos",async (req,res)=>{
   }
 })
 
-router.get("/mutation",async(req,res)=>{
-  res.send(await getIssue())  
-})
 
+//peticion al github
 router.post("/searchIssue",async(req,res)=>{
   const status = req.body.status;
   const name = req.body.name;
@@ -426,7 +428,6 @@ router.post("/searchIssue",async(req,res)=>{
       }
     }
     
-
   }
   const filteredData = filterIssues(element,status,name)
 
@@ -439,6 +440,7 @@ router.post("/export", async(req,res)=>{
   res.download(download)
 })
 
+//comprovacion que existe la sala
 router.post("/checkSala",async(req,res)=>{
   try{
     const id = req.body.id;
@@ -447,7 +449,7 @@ router.post("/checkSala",async(req,res)=>{
       res.sendStatus(404)
       return
     }
-    res.sendStatus(200)
+    res.send(data[0])
   }catch(e){
     console.log(e);
     res.sendStatus(500)
@@ -474,13 +476,13 @@ router.get("/",async(req,res)=>{
   try{
     const headers = {
       "Content-Type":"application/json",
-      Authorization: `bearer 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` // token
+      Authorization: `bearer ` // token
     }
     const info = await fetch(baseUrl,{
       method: "POST",
       headers: headers,
-      //body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
-      body: JSON.stringify(query())
+      body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
+      //body: JSON.stringify(query())
     })
     const infoJson = await info.json()
     console.log(infoJson)

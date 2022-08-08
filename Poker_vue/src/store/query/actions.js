@@ -36,19 +36,20 @@ export async function repoConfig(user,token,project,room,type,startDate){
                 startDate
             }
     }).then((res)=> {
-        localStorage.setItem('room',room)
-        localStorage.setItem("type",type)
         router.push({ name: "game", params: { id: res.data.id } })
     }).catch((e)=> {
         throw Error(e)
     })
 }
 
-export async function getRepoConfig(){
+export async function getRepoConfig(id){
     try{
         const data = await axios({
             url: "http://localhost:3001/getRepoConfig",
-            method: "GET"
+            method: "POST",
+            data:{
+                id
+            }
         })
         return data.data
     }catch(e){
@@ -66,6 +67,7 @@ export async function checkSala(id){
                     id
                 }
         })
+        console.log(data.data);
         return data.data
     }catch(e){
         console.log(e);

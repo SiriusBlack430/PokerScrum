@@ -10,6 +10,8 @@ export default{
       router.push({name:"logged"})
       return
     }
+    this.room = check.name
+    
   },
   name: "Query",
   data(){
@@ -22,7 +24,7 @@ export default{
       actualIssue:"",
       actualIssueLink:"",
       user: localStorage.getItem('username'),
-      room: localStorage.getItem('room'),
+      room: "",
       issueOpen:false,
       issueExport:false,
       pickcard:false,
@@ -31,8 +33,8 @@ export default{
   },
   async mounted() {
     try{
-      
-      this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.$route.params.id)
+      this.id = this.$route.params.id
+      this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.id)
       this.project = this.issues[0].project
       this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){
@@ -42,14 +44,14 @@ export default{
   methods:{
     async query(){
       try{
-       this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.type)
+        this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.id)
       }catch(e){
         console.log("Error " + e)
       }
     },
     async refresh(){
       try{
-        this.issues = await queryAPI("","",true,this.type)
+        this.issues = await queryAPI("","",true,this.id)
       }catch(e){
         console.log("ERROR REFRESH "+e)
       }

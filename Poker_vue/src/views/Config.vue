@@ -7,15 +7,16 @@ export default{
         return{
             usuario:'',
             token:'',
-            project:''
+            project:'',
+            startDate:''
         }
     },
     async mounted(){
         try{
-            const data = await getRepoConfig()
+            const data = await getRepoConfig(this.$route.params.id)
             this.usuario = data.name
-            this.token = data.token
             this.project = data.project
+            this.startDate = data.programed_date.replace('Z','').substring(0,16) // solo hasta minutos
         }catch(e){
             console.log("Error " + e)
         }
@@ -23,7 +24,7 @@ export default{
     methods:{
         async config(){
             try{
-                const response = await repoConfig(this.usuario,this.token,this.project)
+                const response = await updateRepoConfig(this.usuario,this.token,this.project)
                 console.log(response)
                 router.push({
                     name:"game"
@@ -41,11 +42,11 @@ export default{
     <h2>CONFIGURATION</h2>
     <form @submit.prevent="config">
         <div class="data">
-            <label for="repository">Usuario:</label>
+            <label for="repository">Login:</label>
             <input 
             type="text" 
             name="repository" 
-            placeholder="Enter Repository Name"
+            placeholder="Enter User or Organization Name"
             v-model="usuario"
             />
         </div>
@@ -66,6 +67,14 @@ export default{
             placeholder="Enter Project Number"
             v-model="project"
             />
+        </div>
+        <div class="data">
+          <label for="start">Start date:</label>
+          <input type="datetime-local" 
+          id="startDate" 
+          name="trip-start"
+          v-model="startDate"
+          >
         </div>
         <div class="data">
             <button type="submit">Save Information</button>

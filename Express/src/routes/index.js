@@ -80,7 +80,7 @@ router.post('/logged',async(req,res)=>{
         let salaInfo =[]
         for(let i in parseData){ 
             const Info = await pool.query("SELECT id,name,programed_date,created_user_id from repconfig where id= ?",parseData[i]['repconfig_id'])
-            salaInfo.push({id:Info[0].id, name:Info[0].name, programed_date:Info[0].programed_date,created_user_id:Info[0].created_user_id})
+            salaInfo.push({id:Info[0].id, name:Info[0].name, programed_date:Info[0].programed_date.toLocaleString(),created_user_id:Info[0].created_user_id})
         }
         res.send(salaInfo)
     }catch(e){

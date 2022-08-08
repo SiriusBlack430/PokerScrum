@@ -6,7 +6,7 @@ export default {
   data(){
     return{
       room:"",
-      user:"",
+      login:"",
       token:"",
       project:"",
       showError:false,
@@ -18,7 +18,7 @@ export default {
     async connection(){
       try{
         
-        await repoConfig(this.user,this.token,this.project,this.room,this.type,this.startDate)
+        await repoConfig(this.login,this.token,this.project,this.room,this.type,this.startDate)
         
       }catch(e){
         this.showError=true;
@@ -69,9 +69,9 @@ export default {
             </select>
             <input 
             type="text" 
-            name="repository" 
+            name="login" 
             @click="showError = false"
-            v-model="user"
+            v-model="login"
             />
         </div>
         <div class="data">
