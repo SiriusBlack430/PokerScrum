@@ -1,5 +1,6 @@
 <script>
 import { LoggedAPI } from '../store/login/actions'
+import router from '../router'
 export default {
   name: "get-rules",
   data() {
@@ -21,7 +22,16 @@ export default {
     }catch(e){
       console.log(e)
     }
-  }
+  },
+  methods: {
+    goTo(idGame){
+      try{
+        router.push({ name:"game", params:{ id: idGame }})
+      }catch(e){
+        console.log(e);
+      }
+    }
+  },
 }
 
 </script>
@@ -45,15 +55,15 @@ export default {
       </header>
   </div>
   <div class="space"></div>
-  <main class="flex">
+  <main class="grid">
    <!--  <div class="maintenance">
       <h1>Page in Maintenance</h1>
       <div class="games">
         <img src="https://www.clipartkey.com/mpngs/m/184-1849588_maintenance-website-landing-page.png" alt="centro">
       </div>
     </div> -->
-    <div v-for="{name,programed_date} in sessions">
-        <div style="border: 1px solid; text-align:center">
+    <div v-for="{name,programed_date,id} in sessions">
+        <div style="border: 1px solid; text-align:center;cursor: pointer;" @click="goTo(id)" >
           <h1>{{name}}</h1>
           <p>{{programed_date}}</p>
         </div> 
@@ -62,10 +72,10 @@ export default {
 </template>
 
 <style>
-.flex{
+.grid{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: 10px;
+  grid-gap: 20px;
 }
 main{
   width:100%

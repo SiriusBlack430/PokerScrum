@@ -80,34 +80,17 @@ function queryIssues(login,projectNum,userOrOrganization){
 } 
 function query(){
   return {"query":`
-  query{
-    organization(login:"gps-plan"){
-      projectV2(number:7){
-        id
-        title
-        fields(first:20){
-          nodes{
-            ... on ProjectV2SingleSelectField{
-              name
-              options{
-                name
-              }
-            }
-            ... on ProjectV2Field{
-              id
-              name
-            }
-          }
-        }
-        items(first:100){
-          totalCount
-          edges{
-            cursor
-            node{
-              content{
-                __typename
-                ... on Issue{
-                  number
+  {
+    search(query: "org:gps-plan casos", type: REPOSITORY, first: 1) {
+      edges {
+        node {
+          __typename
+          ... on Repository {
+            id
+            name
+            projectsV2(first:10){
+              edges{
+                node{
                   title
                 }
               }
@@ -338,13 +321,19 @@ async function imprimir(element){
 }
 
 // get repository configuration from mysql
-async function getRepConfig(){
-  const repConfig = await pool.query("SELECT * FROM REPCONFIG LIMIT 1")
-  if(repConfig.length!==1){
-    throw Error("No hay una configuracion")
-  } else {
-    return repConfig[0]
+async function getRepConfig(id){
+  try{
+    const repConfig = await pool.query("SELECT * FROM REPCONFIG WHERE id=?",id)
+    if(repConfig.length!==1){
+      throw Error("No hay una configuracion")
+    } else {
+      return repConfig[0]
+    }
+  }catch(e){
+    console.log(e);
+
   }
+ 
 }
 
 router.get("/getRepoConfig",async(req,res)=>{
@@ -370,8 +359,12 @@ router.post("/configRepos",async (req,res)=>{
       body: JSON.stringify(queryConnection(data.user,data.project,data.type))
     })
     const infoJson = await info.json();
+    if(infoJson.data === undefined){
+      res.sendStatus(404)
+      return
+    }
     let fields
-    if(data.type ==="user"){
+    if(data.type ==="user"){ 
       fields = infoJson.data.user.projectV2.id;
     }else if(data.type ==="organization"){
       fields = infoJson.data.organization.projectV2.id;
@@ -388,7 +381,6 @@ router.post("/configRepos",async (req,res)=>{
         console.log(e)
         res.sendStatus(500)
       }
-      
     }
   }catch(e){
     console.log(e);
@@ -404,22 +396,21 @@ router.post("/searchIssue",async(req,res)=>{
   const status = req.body.status;
   const name = req.body.name;
   const refresh = req.body.refresh
-  const type = req.body.type
-  
+  const idRoom = req.body.idRoom
   if(element.length===0 || refresh){
     if(refresh){
       element=[],cart = {}
     } 
-    const data = await getRepConfig()
+    const data = await getRepConfig(idRoom)
     const infoJson = await getIssue(data,null)
-    filterInfoJson(infoJson,type)
+    filterInfoJson(infoJson,data.type)
     if(data.type ==="organization"){
       if(infoJson.data.organization.projectV2.items.totalCount > 100){
         const petitions = Math.trunc(infoJson.data.organization.projectV2.items.totalCount/100)
         let cursor = infoJson.data.organization.projectV2.items.edges[infoJson.data.organization.projectV2.items.edges.length-1].cursor
         for(let i =0;i<petitions;i++){
           let info = await getIssue(data,cursor)
-          filterInfoJson(info,type)
+          filterInfoJson(info,data.type)
           cursor = info.data.organization.projectV2.items.edges[info.data.organization.projectV2.items.edges.length-1].cursor
         }
       }
@@ -429,7 +420,7 @@ router.post("/searchIssue",async(req,res)=>{
         let cursor = infoJson.data.user.projectV2.items.edges[infoJson.data.user.projectV2.items.edges.length-1].cursor
         for(let i =0;i<petitions;i++){
           let info = await getIssue(data,cursor)
-          filterInfoJson(info,type)
+          filterInfoJson(info,data.type)
           cursor = info.data.organization.projectV2.items.edges[info.data.user.projectV2.items.edges.length-1].cursor
         }
       }
@@ -448,6 +439,23 @@ router.post("/export", async(req,res)=>{
   res.download(download)
 })
 
+router.post("/checkSala",async(req,res)=>{
+  try{
+    const id = req.body.id;
+    const data = await pool.query("SELECT * FROM REPCONFIG WHERE ID=?;",id)
+    if(data.length===0){
+      res.sendStatus(404)
+      return
+    }
+    res.sendStatus(200)
+  }catch(e){
+    console.log(e);
+    res.sendStatus(500)
+  } 
+    
+})
+
+
 // itemId es el id de issue dentro de projectV2, fieldId es el id de valoracion
 function mutation(){
   return{
@@ -461,18 +469,18 @@ function mutation(){
     }`,
   }
 }
-//token  ghp_LUsFedtFM7gzvZnQ   Tr8t3lXUnuUg213LcKoa
+//ruta de pruebas en express
 router.get("/",async(req,res)=>{
   try{
     const headers = {
       "Content-Type":"application/json",
-      Authorization: `bearer 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` // token
+      Authorization: `bearer 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` // token
     }
     const info = await fetch(baseUrl,{
       method: "POST",
       headers: headers,
-      body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
-      //body: JSON.stringify(queryIssues())
+      //body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
+      body: JSON.stringify(query())
     })
     const infoJson = await info.json()
     console.log(infoJson)

@@ -1,7 +1,7 @@
 import axios from "axios";
 import router from "../../router";
 
-export async function queryAPI(status,name,refresh,type){
+export async function queryAPI(status,name,refresh,idRoom){
 
     try{
         const data = await axios({
@@ -11,7 +11,7 @@ export async function queryAPI(status,name,refresh,type){
                 status: status,
                 name: name,
                 refresh,
-                type
+                idRoom
             }
         })
         return data.data
@@ -57,7 +57,21 @@ export async function getRepoConfig(){
     
 }
 
-
+export async function checkSala(id){
+    try{
+        const data = await axios({
+            url: "http://localhost:3001/checkSala",
+                method: "POST",
+                data:{
+                    id
+                }
+        })
+        return data.data
+    }catch(e){
+        console.log(e);
+    }
+   
+}
 export async function exportIssues(issues){
     await axios({
         url: "http://localhost:3001/export",

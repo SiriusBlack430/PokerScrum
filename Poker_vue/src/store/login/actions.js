@@ -52,9 +52,5 @@ export async function LoggedAPI(id){
     }catch(e){
         console.log(e);
         throw Error(e)
-    }
-   
-        
-   
-   
+    } 
 }

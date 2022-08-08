@@ -1,10 +1,16 @@
 <script>
-import {queryAPI} from '../store/query/actions'
-import {exportIssues} from '../store/query/actions'
+import {queryAPI,exportIssues,checkSala} from '../store/query/actions'
 import router from '../router'
 
 
 export default{
+  async beforeMount() {
+    const check = await checkSala(this.$route.params.id)
+    if(!check){
+      router.push({name:"logged"})
+      return
+    }
+  },
   name: "Query",
   data(){
     return{
@@ -21,13 +27,12 @@ export default{
       issueExport:false,
       pickcard:false,
       id: 0,
-      type: localStorage.getItem('type')
     }
   },
   async mounted() {
     try{
-      this.id = this.$route.params.id
-      this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.type)
+      
+      this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.$route.params.id)
       this.project = this.issues[0].project
       this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
     } catch(e){
