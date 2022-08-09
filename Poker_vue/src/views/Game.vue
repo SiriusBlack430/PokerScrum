@@ -34,9 +34,10 @@ export default{
   async mounted() {
     try{
       this.id = this.$route.params.id
+      // deberia cargarse todas las issues solo para el ADMIN 
       this.issues = await queryAPI(this.statusIssue,this.nameIssue,false,this.id)
       this.project = this.issues[0].project
-      this.statusFilter = Array.from(new Set(this.issues.map(tempObject => tempObject.status)));
+      this.statusFilter =  Array.from(new Set(this.issues.map(tempObject => tempObject.status)))
     } catch(e){
         console.log("Error " + e)
     }
@@ -79,7 +80,7 @@ export default{
         <a href="/">
           <img src="https://boldworkplanner.com/wp-content/themes/boldworkplannertheme/imgs/logo-bold.svg" alt="logo">
         </a>
-        <h1>{{room}} - {{$route.params.id}}</h1>
+        <h1>{{room}}</h1>
       </div>
       <div class="right">
             <ul>   
@@ -99,7 +100,7 @@ export default{
           </div>
     </header>
     </div>
-    <teleport to="body">
+    <teleport to="body" style="width: 100%;">
       <div class="show-issues" v-if="issueOpen">
           <div class="issueshead">
             <h1>{{project}}</h1>
@@ -119,7 +120,7 @@ export default{
               <div id="select-input">
                 <select v-model="statusIssue">
                   <option value="all">All</option>
-                  <option v-for="status in statusFilter"  :selected="status" >{{status}}</option>
+                  <option v-for="status in statusFilter" :key="status" :selected="status" >{{status}}</option>
                 </select>
                 <input type="text" name="username" placeholder="Enter Status" v-model="nameIssue">
               </div>
@@ -137,7 +138,7 @@ export default{
                         <th scope="col">Label</th>
                     </tr>
                 </thead>
-                <tbody v-for="{title,status,label,url} in issues" :key="issues.id">
+                <tbody v-for="{title,status,label,url,id} in issues" :key="id">
                     <tr>
                         <td class="titulo" @click="actualIssue=title, actualIssueLink=url"><a>{{title}}</a></td> 
                         <td>{{status}}</td>
@@ -173,7 +174,7 @@ export default{
                         <th scope="col">Participants</th>
                     </tr>
                 </thead>
-                <tbody v-for="{id,title,status,label,description,assign,participant,url} in issues" :key="issues.id">
+                <tbody v-for="{id,title,status,label,description,assign,participant,url} in issues" :key="id" >
                     <tr>
                         <td><a :href="url" target="_blank">{{id}}</a></td>
                         <td class="titulo" @click="actualIssue=title"><a>{{title}}</a></td> 
@@ -223,6 +224,10 @@ export default{
 </template>
 
 <style>
+.issues table{
+  table-layout: fixed;
+  width: 100%;
+}
 
 .show-export{
   top: 0;
@@ -240,7 +245,7 @@ export default{
   margin-right: auto;
   background-color: white;
   border-radius: 1.5rem;
-  overflow: auto;
+  overflow-x: hidden;
   padding: 1rem;
   text-align: center;
 }

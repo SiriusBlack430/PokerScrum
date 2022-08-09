@@ -1,5 +1,5 @@
 <script>
-import {repoConfig} from '../store/query/actions'
+import {setRepoConfig} from '../store/query/actions'
 
 export default {
   name:"gameConnection",
@@ -18,7 +18,7 @@ export default {
     async connection(){
       try{
         
-        await repoConfig(this.login,this.token,this.project,this.room,this.type,this.startDate)
+        await setRepoConfig(this.login,this.token,this.project,this.room,this.type,this.startDate)
         
       }catch(e){
         this.showError=true;
@@ -31,7 +31,8 @@ export default {
 
 </script>
 <template>
-  <div class="menu-container">
+<div>
+<div class="menu-container">
   <header>
     <div class="left">
       <a href="/">
@@ -41,7 +42,6 @@ export default {
     </div>
   </header>
   </div>
-  <div class="space"></div>
   <main>
     <div class="container">
       <h2>CONFIGURATION</h2>
@@ -57,7 +57,7 @@ export default {
             type="text" 
             name="room"
             v-model="room"
-            placeholder="Enter Game Room"
+            placeholder="Enter room name"
             @click="showError = false"
             required
             >
@@ -109,6 +109,8 @@ export default {
       </form>
     </div>
   </main>
+</div>
+  
 </template>
 
 <style>

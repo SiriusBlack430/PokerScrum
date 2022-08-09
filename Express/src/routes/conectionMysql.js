@@ -11,43 +11,48 @@ pool.query = promisify(pool.query);
 
 module.exports = pool;
 /*
-CREATE DATABASE prueba;
-use prueba;
+CREATE DATABASE PRUEBA;
+USE PRUEBA;
 
 DROP TABLE IF EXISTS USER;
 CREATE TABLE USER(
-    id bigint unsigned primary key auto_increment,
-    username VARCHAR(50),
-    password VARCHAR(200),
-    permiss VARCHAR(20)
+    ID BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    USERNAME VARCHAR(50),
+    PASSWORD VARCHAR(200),
+    PERMISS VARCHAR(20)
 );
-INSERT INTO USER(username,password,permiss) VALUES("amy","$2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a","ADMIN");
+INSERT INTO USER(USERNAME,PASSWORD,PERMISS) VALUES("amy","$2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a","ADMIN");
 
 DROP TABLE IF EXISTS REPCONFIG;
 CREATE TABLE REPCONFIG(
-    id bigint unsigned primary key auto_increment,
-    login VARCHAR(50) not null,
-    token VARCHAR(200) not null,
-    project int(2) not null,
-    type VARCHAR(50) not null,
-    programed_date DATETIME,
-    created_user_id bigint unsigned not null,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    name varchar(50) not null,
-    foreign key(created_user_id) references user(id)
+    ID BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    LOGIN VARCHAR(50) NOT NULL,
+    TOKEN VARCHAR(200) NOT NULL,
+    PROJECT INT(2) NOT NULL,
+    TYPE VARCHAR(50) NOT NULL,
+    PROGRAMED_DATE DATETIME,
+    CREATED_USER_ID BIGINT UNSIGNED NOT NULL,
+    CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    NAME VARCHAR(50) NOT NULL,
+    FOREIGN KEY(CREATED_USER_ID) REFERENCES USER(ID)
 );
 
-INSERT INTO REPCONFIG(login,token,project,type,created_user_id,name) VALUES("gps-plan","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",7,"organization",2,"mock room")
+INSERT INTO REPCONFIG(LOGIN,TOKEN,PROJECT,TYPE,CREATED_USER_ID,NAME) VALUES("gps-plan","token",7,"organization",2,"mock room")
 
 DROP TABLE IF EXISTS USER_SALA;
 CREATE TABLE USER_SALA(
-    user_id bigint unsigned,
-    repconfig_id bigint unsigned,
-    primary key(user_id,repconfig_id),
-    foreign key (user_id) references user(id),
-    foreign key (repconfig_id) references repconfig(id)
+    USER_ID BIGINT UNSIGNED,
+    REPCONFIG_ID BIGINT UNSIGNED,
+    PRIMARY KEY(USER_ID,REPCONFIG_ID),
+    FOREIGN KEY (USER_ID) REFERENCES USER(ID),
+    FOREIGN KEY (REPCONFIG_ID) REFERENCES REPCONFIG(ID)
 )
 
+DROP IF EXISTS ISSUE_SALA;
+CREATE TABLE ISSUE_SALA(
+    ISSUE_ID INT(4) NOT NULL,
+    
+);
 */
 
  //amy password =  $2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a

@@ -21,10 +21,10 @@ export async function queryAPI(status,name,refresh,idRoom){
     
 }
 
-export async function repoConfig(user,token,project,room,type,startDate){
+export async function setRepoConfig(user,token,project,room,type,startDate){
     const id = localStorage.getItem('id')
     await axios({
-        url: "http://localhost:3001/configRepos",
+        url: "http://localhost:3001/setConfigRepos",
             method: "POST",
             data:{
                 room,
@@ -57,7 +57,25 @@ export async function getRepoConfig(id){
     }
     
 }
-
+export async function updateRepoConfig(modified,id){
+    try{
+        await axios({
+            url: "http://localhost:3001/updateRepoConfig",
+            method: "POST",
+            data:{
+                room: modified.room,
+                login: modified.login,
+                token: modified.token,
+                project: modified.project,
+                type: modified.type,
+                id,
+                startDate: modified.startDate
+            }
+        })
+    }catch(e){
+        throw Error(e)
+    }
+}
 export async function checkSala(id){
     try{
         const data = await axios({
@@ -67,7 +85,6 @@ export async function checkSala(id){
                     id
                 }
         })
-        console.log(data.data);
         return data.data
     }catch(e){
         console.log(e);

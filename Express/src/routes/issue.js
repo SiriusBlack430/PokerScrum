@@ -77,30 +77,20 @@ function queryIssues(login,projectNum,userOrOrganization){
       }
     }`,
   }
-} 
-function query(){
+}
+//query de pruebas para la ruta de / de express 
+function query(number){
   return {"query":`
-  {
-    search(query: "org:gps-plan casos", type: REPOSITORY, first: 1) {
-      edges {
-        node {
-          __typename
-          ... on Repository {
-            id
-            name
-            projectsV2(first:10){
-              edges{
-                node{
-                  title
-                }
-              }
-            }
-          }
+  {organization(login:"gps-plan") {
+      repository(name:"casos"){
+        issue(number:${number}){
+          title
         }
       }
     }
-  }`}
+  }  `}
 }
+// query graphql to github with cursor
 function queryIssueWithCursor(login,projectNum,userOrOrganization,cursor){
   return{
     "query":`
@@ -168,6 +158,7 @@ function queryIssueWithCursor(login,projectNum,userOrOrganization,cursor){
     }`,
   }
 }
+// query to check params are correct and return github intern id of project
 function queryConnection(login,projectNum,userOrOrganization){
   return{
     "query":`
@@ -181,9 +172,7 @@ function queryConnection(login,projectNum,userOrOrganization){
   }
 }
 
-// filter all data that return github and return an js object of issues
-
-//get first 100 issues
+//get 100 issues
 async function getIssue(data,cursor){
   try{
     const headers = {
@@ -212,6 +201,7 @@ async function getIssue(data,cursor){
   }
 }
 
+// filter the response from github and construct the object that contains the data of issues
 function filterInfoJson(infoJson,type){
   try{
     let items,statusNames, fields
@@ -333,9 +323,9 @@ async function getRepConfig(id){
     console.log(e);
 
   }
- 
 }
 
+//return the configuration from one room
 router.post("/getRepoConfig",async(req,res)=>{
   try{
     const repConfig = await pool.query("SELECT login,project,type,convert_tz(programed_date,'+00:00','+02:00') as programed_date,name FROM REPCONFIG WHERE id=?",req.body.id)
@@ -350,7 +340,8 @@ router.post("/getRepoConfig",async(req,res)=>{
   }
 })
 
-router.post("/configRepos",async (req,res)=>{
+//creates the room in mysql with a correct configuration
+router.post("/setConfigRepos",async (req,res)=>{
   const data = req.body;
   try{
     headers = {
@@ -392,8 +383,24 @@ router.post("/configRepos",async (req,res)=>{
   }
 })
 
+router.post("/updateRepoConfig",async(req,res)=>{
+  const data = req.body
+  try{
+    if(data.token===''){
+      await pool.query("UPDATE REPCONFIG SET LOGIN=?,PROJECT=?,TYPE=?,PROGRAMED_DATE=?,NAME=? WHERE ID=?",[data.login,data.project,data.type,data.startDate,data.room,data.id])
+    }else{
+      await pool.query("UPDATE REPCONFIG SET LOGIN=?,TOKEN=?,PROJECT=?,TYPE=?,PROGRAMED_DATE=?,NAME=? WHERE ID=?",[data.login,data.token,data.project,data.type,data.startDate,data.room,data.id])
+    }
+    res.sendStatus(200)
+  }catch(e){
+    console.log(e);
+    res.sendStatus(500)
+  }
+  
 
-//peticion al github
+})
+
+// request to github
 router.post("/searchIssue",async(req,res)=>{
   const status = req.body.status;
   const name = req.body.name;
@@ -440,7 +447,7 @@ router.post("/export", async(req,res)=>{
   res.download(download)
 })
 
-//comprovacion que existe la sala
+//checks if exists the room
 router.post("/checkSala",async(req,res)=>{
   try{
     const id = req.body.id;
@@ -457,7 +464,6 @@ router.post("/checkSala",async(req,res)=>{
     
 })
 
-
 // itemId es el id de issue dentro de projectV2, fieldId es el id de valoracion
 function mutation(){
   return{
@@ -471,18 +477,19 @@ function mutation(){
     }`,
   }
 }
+
 //ruta de pruebas en express
 router.get("/",async(req,res)=>{
   try{
     const headers = {
       "Content-Type":"application/json",
-      Authorization: `bearer ` // token
+      Authorization: `bearer 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` // token
     }
     const info = await fetch(baseUrl,{
       method: "POST",
       headers: headers,
-      body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
-      //body: JSON.stringify(query())
+      //body: JSON.stringify(queryIssues("gps-plan",7,"organization"))
+      body: JSON.stringify(query(1210))
     })
     const infoJson = await info.json()
     console.log(infoJson)
@@ -491,4 +498,5 @@ router.get("/",async(req,res)=>{
     console.log(e)
   }
 })
+
 module.exports = router

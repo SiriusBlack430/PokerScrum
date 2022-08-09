@@ -1,34 +1,68 @@
 <script>
-import {repoConfig, getRepoConfig} from "../store/query/actions"
+import {updateRepoConfig, getRepoConfig} from "../store/query/actions"
 import router from "../router";
 export default{
     name: 'Config',
     data(){
         return{
-            usuario:'',
-            token:'',
-            project:'',
-            startDate:''
+            actual: {
+                login:'',
+                token:'',
+                project:'',
+                startDate:'',
+                type:'',
+                room:''
+            },
+            modified:{
+                login:'',
+                token:'',
+                project:'',
+                startDate:'',
+                type:'',
+                room:''  
+            }
+            
         }
     },
     async mounted(){
         try{
             const data = await getRepoConfig(this.$route.params.id)
-            this.usuario = data.name
-            this.project = data.project
-            this.startDate = data.programed_date.replace('Z','').substring(0,16) // solo hasta minutos
+            this.actual.login = data.login
+            this.actual.project = data.project
+            this.actual.type = data.type
+            this.actual.room = data.name
+            this.actual.startDate = data.programed_date.replace('Z','').substring(0,16) // solo hasta minutos
+            this.modified.login = data.login
+            this.modified.project = data.project
+            this.modified.type = data.type
+            this.modified.room = data.name
+            this.modified.startDate = data.programed_date.replace('Z','').substring(0,16) // solo hasta minutos
         }catch(e){
             console.log("Error " + e)
         }
     },
     methods:{
-        async config(){
+        shallowEqual(object1, object2) {
+            const keys1 = Object.keys(object1);
+            const keys2 = Object.keys(object2);
+            if (keys1.length !== keys2.length) {
+                return false;
+            }
+            for (let key of keys1) {
+                if (object1[key] !== object2[key]) {
+                return false;
+                }
+            }
+            return true;
+        },
+        async updateConfig(){
             try{
-                const response = await updateRepoConfig(this.usuario,this.token,this.project)
-                console.log(response)
+                if(! this.shallowEqual(this.actual,this.modified)){
+                    await updateRepoConfig(this.modified,this.$route.params.id)
+                }
                 router.push({
-                    name:"game"
-                })
+                    name:"game",params:{ id: this.$route.params.id }
+                    })
             }catch(e){
                 console.log(e)
             }
@@ -40,14 +74,29 @@ export default{
 
 <div class="container">
     <h2>CONFIGURATION</h2>
-    <form @submit.prevent="config">
+    <form @submit.prevent="updateConfig">
+        <div class="data">
+            <label for="room">Room Name:</label>
+            <input
+            type="text" 
+            name="room"
+            v-model="modified.room"
+            placeholder="Enter Game Room"
+            @click="showError = false"
+            required
+            >
+        </div>
         <div class="data">
             <label for="repository">Login:</label>
+            <select style="padding:3px;" v-model="modified.type">
+              <option value="user">user</option>
+              <option value="organization">organization</option>
+            </select>
             <input 
             type="text" 
             name="repository" 
             placeholder="Enter User or Organization Name"
-            v-model="usuario"
+            v-model="modified.login"
             />
         </div>
         <div class="data">
@@ -56,7 +105,7 @@ export default{
             type="password" 
             name="token" 
             placeholder="Enter Token"
-            v-model="token"
+            v-model="modified.token"
             />
         </div>
         <div class="data">
@@ -65,7 +114,7 @@ export default{
             type="number" 
             name="project" 
             placeholder="Enter Project Number"
-            v-model="project"
+            v-model="modified.project"
             />
         </div>
         <div class="data">
@@ -73,7 +122,7 @@ export default{
           <input type="datetime-local" 
           id="startDate" 
           name="trip-start"
-          v-model="startDate"
+          v-model="modified.startDate"
           >
         </div>
         <div class="data">
