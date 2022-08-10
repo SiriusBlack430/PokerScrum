@@ -23,12 +23,14 @@ function generateAccessToken(username) {
 function authenticateToken(req, res, next) {
   const authHeader = req.headers.authorization
   const token = authHeader.split(' ')[1]
-  if (token == null) return res.sendStatus(401)
+  if (token === null || token === undefined) return res.sendStatus(401)
   try {
     const decodedUser = jwt.verify(token, secret)
+    console.log(decodedUser)
     next()
   } catch (e) {
-    console.log('Token incorrecto')
+    console.log(e.message)
+    res.sendStatus(401)
   }
 }
 // login check

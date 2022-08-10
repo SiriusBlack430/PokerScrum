@@ -3,7 +3,7 @@ const uuid = require('uuid')
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
-const fetch = require('fetch')
+const fetch = require('node-fetch')
 const pool = require('./conectionMysql')
 
 const router = express.Router()
