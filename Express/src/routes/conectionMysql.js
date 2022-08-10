@@ -1,15 +1,15 @@
-const mysql = require('mysql'); // modulo para bbdd mysql
-const {promisify} = require('util');
+const mysql = require('mysql') // modulo para bbdd mysql
+const { promisify } = require('util')
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    user : 'NormalUser',
-    password: 'NormalUser',
-    database: 'prueba'
+  host: 'localhost',
+  user: 'NormalUser',
+  password: 'NormalUser',
+  database: 'prueba',
 })
-pool.query = promisify(pool.query);
+pool.query = promisify(pool.query)
 
-module.exports = pool;
+module.exports = pool
 /*
 CREATE DATABASE PRUEBA;
 USE PRUEBA;
@@ -21,7 +21,8 @@ CREATE TABLE USER(
     PASSWORD VARCHAR(200),
     PERMISS VARCHAR(20)
 );
-INSERT INTO USER(USERNAME,PASSWORD,PERMISS) VALUES("amy","$2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a","ADMIN");
+INSERT INTO USER(USERNAME,PASSWORD,PERMISS)
+VALUES("amy","$2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a","ADMIN");
 
 DROP TABLE IF EXISTS REPCONFIG;
 CREATE TABLE REPCONFIG(
@@ -32,12 +33,13 @@ CREATE TABLE REPCONFIG(
     TYPE VARCHAR(50) NOT NULL,
     PROGRAMED_DATE DATETIME,
     CREATED_USER_ID BIGINT UNSIGNED NOT NULL,
-    CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     NAME VARCHAR(50) NOT NULL,
     FOREIGN KEY(CREATED_USER_ID) REFERENCES USER(ID)
 );
 
-INSERT INTO REPCONFIG(LOGIN,TOKEN,PROJECT,TYPE,CREATED_USER_ID,NAME) VALUES("gps-plan","token",7,"organization",2,"mock room")
+INSERT INTO REPCONFIG(LOGIN,TOKEN,PROJECT,TYPE,CREATED_USER_ID,NAME)
+VALUES("gps-plan","token",7,"organization",2,"mock room")
 
 DROP TABLE IF EXISTS USER_SALA;
 CREATE TABLE USER_SALA(
@@ -51,8 +53,7 @@ CREATE TABLE USER_SALA(
 DROP IF EXISTS ISSUE_SALA;
 CREATE TABLE ISSUE_SALA(
     ISSUE_ID INT(4) NOT NULL,
-    
 );
 */
 
- //amy password =  $2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a
+// amy password =  $2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a

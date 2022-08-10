@@ -3,9 +3,9 @@ const uuid = require('uuid')
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
+const fetch = require('fetch')
 const pool = require('./conectionMysql')
 
-const fetch = import('node-fetch')
 const router = express.Router()
 
 const baseUrl = 'https://api.github.com/graphql' // url api github
