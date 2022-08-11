@@ -56,12 +56,12 @@ router.post('/log', async (req, res) => {
 router.post('/register', async (req, res) => {
   const data = req.body
   try {
-    const User = await pool.query('SELECT * FROM USER WHERE username= ?', data.username)
+    const User = await pool.query('SELECT * FROM USER WHERE USERNAME= ?', data.username)
     if (User.length !== 0) {
       res.sendStatus(404)
     } else {
       const hashedPassword = await bcrypt.hash(data.password, saltRounds)
-      await pool.query('INSERT INTO USER(username,password,permiss) VALUES(?,?,?)', [data.username, hashedPassword, 'USER'], (e) => {
+      await pool.query('INSERT INTO USER(USERNAME,PASSWORD,PERMISS) VALUES(?,?,?)', [data.username, hashedPassword, 'USER'], (e) => {
         if (e) {
           res.sendStatus(404)
         }
@@ -76,17 +76,17 @@ router.post('/register', async (req, res) => {
 router.post('/logged', async (req, res) => {
   const { id } = req.body
   try {
-    const data = await pool.query('SELECT repconfig_id from user_sala where user_id=?', id)
+    const data = await pool.query('SELECT SALA_ID FROM USER_SALA WHERE USER_ID=?', id)
     const parseData = Object.values(JSON.parse(JSON.stringify(data)))
     const salaInfo = []
     for (let i = 0; i < parseData.length; i++) {
       // eslint-disable-next-line no-await-in-loop
-      const Info = await pool.query('SELECT id,name,programed_date,created_user_id from repconfig where id= ?', parseData[i].repconfig_id)
+      const Info = await pool.query('SELECT ID,NAME,PROGRAMED_DATE,CREATED_USER_ID FROM SALA WHERE ID= ?', parseData[i].SALA_ID)
       salaInfo.push({
-        id: Info[0].id,
-        name: Info[0].name,
-        programed_date: Info[0].programed_date.toLocaleString(),
-        created_user_id: Info[0].created_user_id,
+        id: Info[0].ID,
+        name: Info[0].NAME,
+        programed_date: Info[0].PROGRAMED_DATE.toLocaleString(),
+        created_user_id: Info[0].CREATED_USER_ID,
       })
     }
     res.send(salaInfo)
@@ -97,7 +97,7 @@ router.post('/logged', async (req, res) => {
 })
 
 router.get('/userList', authenticateToken, async (req, res) => {
-  const User = await pool.query('SELECT id,username,permiss FROM USER')
+  const User = await pool.query('SELECT ID,USERNAME,PERMISS FROM USER')
   res.send({ User })
 })
 

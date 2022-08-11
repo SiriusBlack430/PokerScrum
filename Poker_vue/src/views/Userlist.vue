@@ -4,7 +4,7 @@ export default {
   name: "get-UserList",
   data() {
     return {  
-      User:{} 
+      User:[] 
     }
   },
   async mounted(){
@@ -19,6 +19,7 @@ export default {
         }
       })
       this.User = response.data.User
+      console.log(this.User);
     }catch(e){
       console.log(e)
     }
@@ -27,6 +28,7 @@ export default {
 </script>
 
 <template>
+<div>
 <div class="menu-container">
   <header>
     <div class="left">
@@ -49,9 +51,9 @@ export default {
                 </tr>
             </thead>
             <tbody >
-                <tr v-for="{username,permiss} in User" :key="User.id">
-                    <td>{{username}}</td> 
-                    <td>{{permiss}}</td>
+                <tr v-for="{USERNAME,PERMISS,ID} in User" :key="ID">
+                    <td>{{USERNAME}}</td> 
+                    <td>{{PERMISS}}</td>
                     <td>
                       <div class="right">
                         <ul>
@@ -69,6 +71,8 @@ export default {
         </table>
     </article>
   </main>
+</div>
+
 </template>
 
 <style>

@@ -27,16 +27,16 @@ export default{
     async mounted(){
         try{
             const data = await getRepoConfig(this.$route.params.id)
-            this.actual.login = data.login
-            this.actual.project = data.project
-            this.actual.type = data.type
-            this.actual.room = data.name
-            this.actual.startDate = data.programed_date.replace('Z','').substring(0,16) // solo hasta minutos
-            this.modified.login = data.login
-            this.modified.project = data.project
-            this.modified.type = data.type
-            this.modified.room = data.name
-            this.modified.startDate = data.programed_date.replace('Z','').substring(0,16) // solo hasta minutos
+            this.actual.login = data.LOGIN
+            this.actual.project = data.PROJECT
+            this.actual.type = data.TYPE
+            this.actual.room = data.NAME
+            this.actual.startDate = data.PROGRAMED_DATE.replace('Z','').substring(0,16) // solo hasta minutos
+            this.modified.login = data.LOGIN
+            this.modified.project = data.PROJECT
+            this.modified.type = data.TYPE
+            this.modified.room = data.NAME
+            this.modified.startDate = data.PROGRAMED_DATE.replace('Z','').substring(0,16) // solo hasta minutos
         }catch(e){
             console.log("Error " + e)
         }

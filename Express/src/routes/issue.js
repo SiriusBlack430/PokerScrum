@@ -333,7 +333,7 @@ async function imprimir(element) {
 // get repository configuration from mysql
 async function getRepConfig(id) {
   try {
-    const repConfig = await pool.query('SELECT * FROM REPCONFIG WHERE id=?', id)
+    const repConfig = await pool.query('SELECT * FROM SALA WHERE ID=?', id)
     if (repConfig.length !== 1) {
       throw Error('No hay una configuracion')
     } else {
@@ -348,7 +348,7 @@ async function getRepConfig(id) {
 // return the configuration from one room
 router.post('/getRepoConfig', async (req, res) => {
   try {
-    const repConfig = await pool.query("SELECT login,project,type,convert_tz(programed_date,'+00:00','+02:00') as programed_date,name FROM REPCONFIG WHERE id=?", req.body.id)
+    const repConfig = await pool.query("SELECT LOGIN,PROJECT,TYPE,CONVERT_TZ(PROGRAMED_DATE,'+00:00','+02:00') AS PROGRAMED_DATE,NAME FROM SALA WHERE ID=?", req.body.id)
     if (repConfig.length !== 1) {
       res.sendStatus(404)
     } else {
@@ -386,7 +386,7 @@ router.post('/setConfigRepos', async (req, res) => {
     }
     if (fields !== null) {
       try {
-        await pool.query('INSERT INTO REPCONFIG(login,token,project,type,created_user_id,programed_date,name) VALUES(?,?,?,?,?,?,?)', [data.user, data.token, data.project, data.type, data.id, data.startDate, data.room])
+        await pool.query('INSERT INTO SALA(LOGIN,TOKEN,PROJECT,TYPE,CREATED_USER_ID,PROGRAMED_DATE,NAME) VALUES(?,?,?,?,?,?,?)', [data.user, data.token, data.project, data.type, data.id, data.startDate, data.room])
         const id = await pool.query('SELECT LAST_INSERT_ID();')
         const idformat = Object.values(JSON.parse(JSON.stringify(id)))
         await pool.query('INSERT INTO USER_SALA VALUES(?,?)', [data.id, idformat[0]['LAST_INSERT_ID()']])
@@ -406,9 +406,9 @@ router.post('/updateRepoConfig', async (req, res) => {
   const data = req.body
   try {
     if (data.token === '') {
-      await pool.query('UPDATE REPCONFIG SET LOGIN=?,PROJECT=?,TYPE=?,PROGRAMED_DATE=?,NAME=? WHERE ID=?', [data.login, data.project, data.type, data.startDate, data.room, data.id])
+      await pool.query('UPDATE SALA SET LOGIN=?,PROJECT=?,TYPE=?,PROGRAMED_DATE=?,NAME=? WHERE ID=?', [data.login, data.project, data.type, data.startDate, data.room, data.id])
     } else {
-      await pool.query('UPDATE REPCONFIG SET LOGIN=?,TOKEN=?,PROJECT=?,TYPE=?,PROGRAMED_DATE=?,NAME=? WHERE ID=?', [data.login, data.token, data.project, data.type, data.startDate, data.room, data.id])
+      await pool.query('UPDATE SALA SET LOGIN=?,TOKEN=?,PROJECT=?,TYPE=?,PROGRAMED_DATE=?,NAME=? WHERE ID=?', [data.login, data.token, data.project, data.type, data.startDate, data.room, data.id])
     }
     res.sendStatus(200)
   } catch (e) {
@@ -478,7 +478,7 @@ router.post('/export', async (req, res) => {
 router.post('/checkSala', async (req, res) => {
   try {
     const { id } = req.body
-    const data = await pool.query('SELECT * FROM REPCONFIG WHERE ID=?;', id)
+    const data = await pool.query('SELECT * FROM SALA WHERE ID=?;', id)
     if (data.length === 0) {
       res.sendStatus(404)
       return
