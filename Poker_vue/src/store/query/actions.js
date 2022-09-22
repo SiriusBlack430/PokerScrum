@@ -1,7 +1,6 @@
 import axios from "axios";
 import router from "../../router";
 
-
 export async function queryAPI(status,name,refresh){
 
     try{
@@ -21,12 +20,13 @@ export async function queryAPI(status,name,refresh){
     
 }
 
-export async function repoConfig(user,token,project,room){
+export async function repoConfig(userOrg,name,token,project,room){
     await axios({
         url: "http://localhost:3001/configRepos",
             method: "POST",
             data:{
-                user:user,
+                userOrg:userOrg,
+                name:name,
                 token:token,
                 project:project
             }
@@ -51,7 +51,6 @@ export async function getRepoConfig(){
     
 }
 
-
 export async function exportIssues(issues){
     await axios({
         url: "http://localhost:3001/export",
@@ -72,4 +71,21 @@ export async function exportIssues(issues){
     }).catch((e)=>{
         throw new Error(e)
     })
+}
+
+export async function mutationIssue(project,field,item,number){
+    try{
+        const data = await axios({
+            url: "http://localhost:3001/mutation",
+            method: "POST",
+            data:{
+                project: project,
+                field: field,
+                item: item,
+                number: number
+            }
+        })
+    }catch(e){
+        throw Error("Error " + e)
+    }
 }

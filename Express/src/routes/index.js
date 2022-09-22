@@ -1,22 +1,25 @@
 const express = require('express')
 const router = express.Router()
-const pool = require("./conectionMysql")
+const sequelize = require("./conectionMysql")
 const bcrypt = require ('bcrypt')
 const jwt = require('jsonwebtoken')
 const issue = require('./issue')
+const User = require('../models/user');
 const secret = 'SECRET'
 const saltRounds = 10
 
-pool.getConnection((err)=>{
-    if(err){
-        console.log(err)
-        return
-    }
-    console.log("DB connected")
-})
+try {
+    sequelize.authenticate();
+    //sequelize.sync();
+    console.log('DB connected');
+} catch (error) {
+    console.error('Unable to connect to the database:', error);
+}
+
 function generateAccessToken(username){
     return jwt.sign(username,secret)
 }
+
 function authenticateToken(req,res,next){
     const authHeader = req.headers['authorization']
     const token = authHeader.split(' ')[1]
@@ -29,18 +32,24 @@ function authenticateToken(req,res,next){
     }
     
 }
+
+router.get('/index',async (req, res)=>{
+    res.redirect("/index")
+});
+
 // login check
 router.post('/log',async (req,res)=>{
     const data = req.body
-    const User = await pool.query("SELECT * FROM USER WHERE username= ?",data.username)
-    console.log(User);
-    if(User.length==0){
+    const user= await User.findAll({
+        where: { username: data.username}
+    })
+    if(user.length==0){
         res.sendStatus(404)
     }else{
-        const compare = await bcrypt.compare(data.password,User[0].password)
+        const compare = await bcrypt.compare(data.password,user[0].password)
         if(compare){          
             const token = generateAccessToken(data.username)
-            const permiss = User[0].permiss
+            const permiss = user[0].permiss
             res.send({token, permiss})
         }else{
             res.sendStatus(404)
@@ -52,19 +61,26 @@ router.post('/log',async (req,res)=>{
 router.post('/register', async (req, res)=>{
     const data = req.body;
     try{
-        const User = await pool.query("SELECT * FROM USER WHERE username= ?",data.username)
-        if(User.length !==0){
+        const user= await User.findAll({
+            where: { username: data.username}
+        })
+        if(user.length !==0){
             res.sendStatus(404)
         }else{
             const hashedPassword = await bcrypt.hash(data.password,saltRounds)
-            const num = await pool.query("SELECT MAX(id) as id FROM USER")
-            await pool.query("ALTER TABLE USER AUTO_INCREMENT = ?",num[0].id)
-            await pool.query("INSERT INTO USER(username,password,permiss) VALUES(?,?,?)",[data.username,hashedPassword,"USER"],function(e,result){
-                if(e){
-                    res.sendStatus(404)
-                }    
+            /* const num = await User.findAll({
+                attributes: [sequelize.fn('max', sequelize.col('id'))],
+                raw:true
+            }) */
+            try{
+                await User.create({
+                    username:data.username,
+                    password:hashedPassword
+                })
                 res.sendStatus(200)
-            })
+            } catch (err){
+                res.sendStatus(404)
+            }
         }
     }catch(e){
         res.sendStatus(404)
@@ -72,9 +88,8 @@ router.post('/register', async (req, res)=>{
 })
 
 router.get('/userList',authenticateToken,async (req, res)=>{
-    const User = await pool.query("SELECT id,username,permiss FROM USER");
-
-    res.send({User});
+    const user = await User.findAll()
+    res.send({user})
 });
 
 router.use(issue)

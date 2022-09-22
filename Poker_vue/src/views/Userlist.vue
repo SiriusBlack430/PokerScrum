@@ -18,7 +18,7 @@ export default {
           Authorization: "Bearer "+token
         }
       })
-      this.User = response.data.User
+      this.User = response.data.user
     }catch(e){
       console.log(e)
     }

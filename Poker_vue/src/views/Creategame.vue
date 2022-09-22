@@ -6,9 +6,10 @@ export default {
   data(){
     return{
       room:"",
-      user:"",
+      name:"",
       token:"",
       project:"",
+      userOrg:"",
       showError:false,
       issuesLoad:false,
     }
@@ -16,7 +17,7 @@ export default {
   methods:{
     async connection(){
       try{
-        await repoConfig(this.user,this.token,this.project,this.room);
+        await repoConfig(this.userOrg,this.name.split(' ').join(''),this.token.split(' ').join(''),this.project,this.room.split(' ').join(''));
         issuesLoad=true
       }catch(e){
         this.showError=true;
@@ -60,13 +61,16 @@ export default {
             >
         </div>
         <div class="data">
-            <label for="repository">Usuario:</label>
+            <select id="selectUserOrg" v-model="userOrg">
+              <option value="user">USUARIO</option>
+              <option value="org">ORGANIZACIÓN</option>
+            </select>
             <input 
             type="text" 
-            name="repository" 
-            placeholder="Nombre del Repositorio"
+            name="name"
+            placeholder="Nombre de Usuario u Organización"
             @click="showError = false"
-            v-model="user"
+            v-model="name"
             />
         </div>
         <div class="data">
@@ -134,6 +138,11 @@ export default {
 .loading > .info > h2 {
   font-size: 2.5rem;
   padding-top:1.25rem
+}
+
+#selectUserOrg{
+  width: 8rem;
+  margin-bottom: 0.5rem;
 }
 
 </style>
