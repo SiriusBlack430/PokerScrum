@@ -14,7 +14,7 @@ export async function LoginAPI(username, password){
         localStorage.setItem('token',response.data.token);
         localStorage.setItem('permiss',response.data.permiss);
         router.push({
-            name: "logged"
+            name: "creategame"
         })
     }).catch((e)=> {
         console.log(e);

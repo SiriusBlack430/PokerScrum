@@ -23,7 +23,8 @@
         issueOpen:false,
         issueExport:false,
         pickcard:false,
-        vote:false
+        vote:false,
+        votemsg:false
       }
     },
     async mounted() {
@@ -63,6 +64,7 @@
         try{
           await mutationIssue(this.ids[0],this.ids[1],this.ids[2],this.hour)
           this.pickcard=false
+          this.votemsg=true
           this.actualIssue=""
         } catch(e){
           console.log(e);
@@ -84,7 +86,7 @@
           <h1>{{room}}</h1>
         </div>
         <div class="right">
-          <ul>              
+          <ul>
             <div class="button-mod">
               <li> <a href="creategame">SALIR</a></li>
             </div>   
@@ -139,7 +141,7 @@
             <tbody v-for="{id,title,status,url,projectId,estimationId,itemId} in issues" :key="issues.id">
               <tr>
                 <td><a target="_blank" :href="url">{{id}}</a></td>
-                <td class="titulo" @click="actualIssue=title, actualIssueLink=url,ids[0]=projectId,ids[1]=estimationId,ids[2]=itemId"><a>{{title}}</a></td> 
+                <td class="titulo" @click="actualIssue=title,issueOpen=false,actualIssueLink=url,ids[0]=projectId,ids[1]=estimationId,ids[2]=itemId"><a>{{title}}</a></td> 
                 <td>{{status}}</td>
               </tr>
             </tbody>
@@ -183,6 +185,11 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+      <div class="back-message" v-if="votemsg"  @click="votemsg=false">
+        <div class="message">
+          <h1>¡Voto Realizado!</h1>
         </div>
       </div>
     </teleport>
