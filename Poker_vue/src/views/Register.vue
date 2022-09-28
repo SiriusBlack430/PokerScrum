@@ -34,6 +34,22 @@
 </script>
 
 <template>
+    <div class="menu-container">
+      <header>
+        <div class="left">
+          <a href="/">
+            <img src="../assets/logo_gps.jpg" alt="logo">
+          </a>
+        </div>
+        <div class="right">
+          <ul>
+            <div class="button-mod">
+              <li> <a href="/login">LOGIN</a></li>
+            </div>  
+          </ul>
+        </div>
+      </header>
+    </div>
     <div class="container">
         <h2>REGISTRO</h2>
         <div class="pops" v-if="wrongFields" @click="wrongFields = false">
@@ -68,9 +84,6 @@
             </div>
             <div class="data">
                 <button type="submit">Enviar</button>
-            </div>
-            <div>
-                <a href="login">Login</a>
             </div>
         </form>
     </div>

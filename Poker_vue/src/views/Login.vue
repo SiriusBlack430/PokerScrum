@@ -1,29 +1,45 @@
 <script >
-import { LoginAPI } from '../store/login/actions'
-
-export default {
-  name: 'Login',
-  data () {
-    return {
-      username: '',
-      password: '',
-      showError: false
+    import { LoginAPI } from '../store/login/actions'
+    
+    export default {
+        name: 'Login',
+        data () {
+            return {
+                username: '',
+                password: '',
+                showError: false
+            }
+        },
+        methods: {
+            async login () {
+                try{
+                    await LoginAPI(this.username, this.password)
+                }catch(e){
+                    this.showError = true
+                    console.log(e)
+                }  
+            }
+        }
     }
-  },
-  methods: {
-    async login () {
-        try{
-            await LoginAPI(this.username, this.password)
-        }catch(e){
-            this.showError = true
-            console.log(e)
-        }  
-    }
-  }
-}
 </script>
 
 <template>
+    <div class="menu-container">
+      <header>
+        <div class="left">
+          <a href="/">
+            <img src="../assets/logo_gps.jpg" alt="logo">
+          </a>
+        </div>
+        <div class="right">
+          <ul>
+            <div class="button-mod">
+              <li> <a href="/register">REGISTRO</a></li>
+            </div>  
+          </ul>
+        </div>
+      </header>
+    </div>
     <div class="container">
         <h2>LOGIN</h2>
         <div class="pops" v-if="showError"  @click="showError = false">
@@ -54,9 +70,6 @@ export default {
             </div>
             <div class="data">
                 <button type="submit">Enviar</button>
-            </div>
-            <div>
-                <a href="register">Regístrate</a>
             </div>
         </form>
     </div>

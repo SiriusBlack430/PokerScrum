@@ -32,9 +32,9 @@ export default {
         </div>
         <div class="right">
           <ul>
-            <li v-if="showUserList"> <a href="userlist">USERLIST</a></li>
+            <li v-if="showUserList"> <a href="/userlist">USERLIST</a></li>
             <li> <a href="/">SALIR</a></li>
-            <li> <a type="button"  href="creategame" >NUEVO JUEGO</a></li>
+            <li> <a type="button"  href="/creategame" >NUEVO JUEGO</a></li>
 
           </ul>
         </div>
