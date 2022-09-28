@@ -11,8 +11,8 @@
         </div>
         <div class="right">
           <ul>
-            <li> <a href="login">LOGIN</a></li>
-            <li> <a href="register">RESGISTRAR</a></li>
+            <li> <a href="/login">LOGIN</a></li>
+            <li> <a href="/register">RESGISTRAR</a></li>
           </ul>
         </div>
       </header>
@@ -23,7 +23,7 @@
       <h1>Scrum Poker para agilizar el desarrollo de equipo</h1>
       <p>Diviértete siendo productivo con nuestra simple y completa herramienta</p>
       <div class="button-mod">
-        <li> <a href="login">LOGIN</a></li>
+        <li> <a href="/login">LOGIN</a></li>
       </div>
     </div>
     <div class="img">

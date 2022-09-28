@@ -12,7 +12,7 @@ export default {
       const token = localStorage.getItem('token')
       if(token==null) return;
       const response = await axios({
-        url: "http://localhost:3001/userList",
+        url: "api/v1/userList",
         method: "GET",
         headers:{
           Authorization: "Bearer "+token

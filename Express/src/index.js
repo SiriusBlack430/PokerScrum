@@ -13,7 +13,7 @@ app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: false }))
 
 // rutas
-app.use('/', require('./routes'))
+app.use('/api/v1/', require('./routes'))
 
 app.listen(app.get('port'), () => {
   console.log('Server Started')

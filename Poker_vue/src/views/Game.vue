@@ -88,7 +88,7 @@
         <div class="right">
           <ul>
             <div class="button-mod">
-              <li> <a href="creategame">SALIR</a></li>
+              <li> <a href="/creategame">SALIR</a></li>
             </div>   
             <div class="button-mod">
               <li> <a href="#">INVITAR</a></li>
