@@ -2,10 +2,18 @@ const { Sequelize } = require('sequelize');
 //const mysql = require('mysql'); // modulo para bbdd mysql
 //const {promisify} = require('util');
 
-const sequelize = new Sequelize('prueba', 'NormalUser', 'NormalUser', {
-    host: 'localhost',
-    dialect: 'mysql'
-});
+let sequelize;
+if(process.env.npm_lifecycle_event==="dev"){
+    sequelize = new Sequelize('pokerscrum', 'NormalUser', 'NormalUser', {
+        host: 'localhost',
+        dialect: 'mysql'
+    });
+} else {
+    sequelize = new Sequelize('pokerscrum', 'PokerUser', '3sF$ld%5', {
+        host: 'localhost',
+        dialect: 'mysql'
+    });
+}
 
 module.exports = sequelize;
 
@@ -23,8 +31,8 @@ module.exports = pool;
 CREATE DATABASE prueba;
 use prueba;
 
-DROP TABLE IF EXISTS USER;
-CREATE TABLE USER(
+DROP TABLE IF EXISTS USERS;
+CREATE TABLE USERS(
     id int(10) primary key auto_increment,
     username VARCHAR(50),
     password VARCHAR(200),
@@ -32,17 +40,14 @@ CREATE TABLE USER(
     );
     INSERT INTO USERS(username,password,permiss,createdAt,updatedAt) VALUES("amy","$2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a","ADMIN",NOW(),NOW());
     
-    INSERT INTO USERS(username,password,permiss,createdAt,updatedAt) VALUES("yo","$2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a","user",NOW(),NOW());
 
 
-    DROP TABLE IF EXISTS REPCONFIG;
-    CREATE TABLE REPCONFIG(
+    DROP TABLE IF EXISTS REPCONFIGS;
+    CREATE TABLE REPCONFIGS(
         id int(10) primary key auto_increment,
         name VARCHAR(50),
         token VARCHAR(200),
         project int(2)
         );
-        
         */
-        
 //amy password =  $2b$10$B3aozsB.Dw1gFitnm8k3EulfBXrGikAxFMVrYJxHFHR6CjbZanZ0a

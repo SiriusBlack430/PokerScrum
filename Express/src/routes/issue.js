@@ -375,11 +375,13 @@ function mutation(project,field,item,number) {
           var items = infoJson.data.user.projectV2.items.nodes;
           if(items.length>0){
             const repConfig = await Repconfig.findAll({ where: { name: name } })
-            if(repConfig.name==""){
+            if(repConfig==""){
               await Repconfig.create({
-                name:data.user,
+                name:data.name,
                 token:data.token,
-                project:data.project
+                project:data.project,
+                createAt:"NOW()",
+                updateAt: "NOW()"
               })
             }
             res.sendStatus(200);
@@ -392,13 +394,16 @@ function mutation(project,field,item,number) {
           })
           const infoJson = await info.json();
           var items = infoJson.data.organization.projectV2.items.edges;
+          console.log(items);
           if (items.length > 0) {
-            const repConfig = await Repconfig.findAll()
-            if(repConfig.name==""){
+            const repConfig = await Repconfig.findAll({ where: { name: name } })
+            if(repConfig==""){
               await Repconfig.create({
-                name:data.user,
+                name:data.name,
                 token:data.token,
-                project:data.project
+                project:data.project,
+                createAt:"NOW()",
+                updateAt: "NOW()"
               })
             }
             res.sendStatus(200);

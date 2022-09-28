@@ -3,7 +3,7 @@ import router from "../../router";
 
 export async function LoginAPI(username, password){
     await axios({
-        url: "http://localhost:3001/log",
+        url: "/log",
         method: "POST",
         data: {
             username: username,
@@ -24,7 +24,7 @@ export async function LoginAPI(username, password){
 
 export async function RegisterAPI(username,password){
     await axios({
-        url: "http://localhost:3001/register",
+        url: "/register",
         method:"POST",
         data:{
             username: username,

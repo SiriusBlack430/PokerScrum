@@ -5,12 +5,14 @@ const bcrypt = require ('bcrypt')
 const jwt = require('jsonwebtoken')
 const issue = require('./issue')
 const User = require('../models/user');
+const Repconfig = require('../models/repconfig');
 const secret = 'SECRET'
 const saltRounds = 10
 
 try {
     sequelize.authenticate();
-    //sequelize.sync();
+    User.sync();
+    Repconfig.sync();
     console.log('DB connected');
 } catch (error) {
     console.error('Unable to connect to the database:', error);
@@ -68,10 +70,6 @@ router.post('/register', async (req, res)=>{
             res.sendStatus(404)
         }else{
             const hashedPassword = await bcrypt.hash(data.password,saltRounds)
-            /* const num = await User.findAll({
-                attributes: [sequelize.fn('max', sequelize.col('id'))],
-                raw:true
-            }) */
             try{
                 await User.create({
                     username:data.username,

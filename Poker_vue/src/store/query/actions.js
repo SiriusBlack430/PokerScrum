@@ -5,7 +5,7 @@ export async function queryAPI(status,name,refresh){
 
     try{
         const data = await axios({
-            url: "http://localhost:3001/searchIssue",
+            url: "/searchIssue",
             method: "POST",
             data:{
                 status: status,
@@ -22,7 +22,7 @@ export async function queryAPI(status,name,refresh){
 
 export async function repoConfig(userOrg,name,token,project,room){
     await axios({
-        url: "http://localhost:3001/configRepos",
+        url: "/configRepos",
             method: "POST",
             data:{
                 userOrg:userOrg,
@@ -41,7 +41,7 @@ export async function repoConfig(userOrg,name,token,project,room){
 export async function getRepoConfig(){
     try{
         const data = await axios({
-            url: "http://localhost:3001/getRepoConfig",
+            url: "/getRepoConfig",
             method: "GET"
         })
         return data.data
@@ -53,7 +53,7 @@ export async function getRepoConfig(){
 
 export async function exportIssues(issues){
     await axios({
-        url: "http://localhost:3001/export",
+        url: "/export",
         method:"POST",
         data:{
             issues:issues
@@ -76,7 +76,7 @@ export async function exportIssues(issues){
 export async function mutationIssue(project,field,item,number){
     try{
         const data = await axios({
-            url: "http://localhost:3001/mutation",
+            url: "/mutation",
             method: "POST",
             data:{
                 project: project,
