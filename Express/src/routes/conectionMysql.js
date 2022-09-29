@@ -9,7 +9,7 @@ if(process.env.npm_lifecycle_event==="dev"){
         dialect: 'mysql'
     });
 } else {
-    sequelize = new Sequelize('pokerscrum', 'PokerUser', '3sF$ld%5', {
+    sequelize = new Sequelize('POKERSCRUM', 'PokerUser', '3sF$ld%5', {
         host: 'localhost',
         dialect: 'mysql'
     });
